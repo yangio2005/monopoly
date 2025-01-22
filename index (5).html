@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tra Cứu Điểm Sinh Viên</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500&display=swap" rel="stylesheet">
+    
+ 
+     <link rel="stylesheet" href="styles.css" />
+       
+</head>
+<!--modal thông báo-->
+<div class="modal fade" id="notificationModal" tabindex="-1" role="dialog" aria-labelledby="notificationModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="notificationModalLabel">📢 Thông Báo</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body" id="notificationContent">
+                Đang tải thông báo...
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Báo Lỗi -->
+<div class="modal fade" id="reportModal" tabindex="-1" role="dialog" aria-labelledby="reportModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="reportModalLabel">⚠️ Báo Lỗi</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="reportForm">
+                    <div class="form-group">
+                        <label for="reportType">Chọn chế độ báo cáo:</label>
+                        <select class="form-control" id="reportType" onchange="toggleReportFields()">
+                            <option value="anonymous">Ẩn Danh</option>
+                            <option value="identified">Có Thông Tin Cá Nhân</option>
+                        </select>
+                    </div>
+                    <div id="personalInfoFields" style="display: none;">
+                        <div class="form-group">
+                            <label for="fullName">Họ và Tên:</label>
+                            <input type="text" class="form-control" id="fullName" placeholder="Nhập họ và tên">
+                        </div>
+                        <div class="form-group">
+                            <label for="studentId">MSSV:</label>
+                            <input type="text" class="form-control" id="studentId" placeholder="Nhập MSSV">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="reportContent">Nội dung báo cáo:</label>
+                        <textarea class="form-control" id="reportContent" rows="4" placeholder="Nhập nội dung báo cáo"></textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Đóng</button>
+                <button type="button" class="btn btn-primary" onclick="submitReport()">Gửi Báo Cáo</button>
+            </div>
+        </div>
+    </div>
+</div>
+   <!-- Thông báo sau khi báo lỗi -->
+<div id="successMessage" style="display: none; background-color: #4CAF50; color: white; padding: 15px; margin-top: 20px;">
+    Báo cáo đã được gửi thành công!
+</div>
+
+<body>
+  <div id="content-to-export">
+    <div class="container main-container">
+        <div class="header">
+            <h2>🎓 Tra Cứu Điểm Rèn Luyện Sinh Viên</h2>
+            <p class="text-muted">Nhập MSSV hoặc tên sinh viên để tra cứu</p>
+        </div>
+        
+ <div class="text-right d-flex justify-content-between">
+    <!-- Nút Thông Báo -->
+    <button class="btn btn-warning blinking-button" onclick="showNotifications()">🔔 Thông Báo</button>
+
+  
+
+  <!-- Nút Báo Lỗi -->
+  <button class="btn btn-danger" data-toggle="modal" data-target="#reportModal">⚠️ Báo Lỗi</button>
+  
+</div>
+
+
+
+        <div class="search-box">
+            <input type="text" id="searchInput" class="form-control form-control-lg" placeholder="Nhập MSSV hoặc tên sinh viên">
+            <button class="btn btn-primary mt-3 search-btn" onclick="search()">🔍 Tìm Kiếm</button>
+        </div>
+
+        <div id="results"></div>
+    </div>
+</div>
+    <script src="script1.js"></script>
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.2/dist/js/bootstrap.bundle.min.js"></script>
+ 
+ 
+
+</body>
+</html>
