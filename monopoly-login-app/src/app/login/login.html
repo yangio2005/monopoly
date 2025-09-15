@@ -1,0 +1,31 @@
+<div class="login-container">
+  <div class="login-card">
+    <h1 class="login-title">Welcome to Monopoly!</h1>
+
+    <div class="social-login">
+      <button class="google-btn" (click)="loginWithGoogle()">
+        <img src="assets/google-icon.png" alt="Google Icon" class="icon">
+        Login with Google
+      </button>
+    </div>
+
+    <div class="separator">
+      <span>OR</span>
+    </div>
+
+    <form class="email-login" (ngSubmit)="isLoginMode ? loginWithEmailPassword() : signUpWithEmailPassword()">
+      <div class="form-group">
+        <input type="email" placeholder="Email" required [(ngModel)]="email" name="email">
+      </div>
+      <div class="form-group">
+        <input type="password" placeholder="Password" required [(ngModel)]="password" name="password">
+      </div>
+      <button type="submit" class="login-btn">{{ isLoginMode ? 'Login' : 'Sign Up' }}</button>
+    </form>
+
+    <p class="signup-text">
+      {{ isLoginMode ? "Don't have an account?" : "Already have an account?" }}
+      <a href="#" (click)="toggleMode($event)">{{ isLoginMode ? 'Sign Up' : 'Login' }}</a>
+    </p>
+  </div>
+</div>

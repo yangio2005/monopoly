@@ -1,0 +1,108 @@
+.login-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  background: linear-gradient(to right, #6a11cb, #2575fc); /* Modern gradient background */
+  font-family: 'Arial', sans-serif;
+}
+
+.login-card {
+  background-color: #fff;
+  padding: 2rem;
+  border-radius: 10px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+  text-align: center;
+  width: 90%;
+  max-width: 400px;
+}
+
+.login-title {
+  color: #333;
+  margin-bottom: 1.5rem;
+  font-size: 1.8rem;
+}
+
+.social-login button {
+  width: 100%;
+  padding: 0.8rem;
+  border: none;
+  border-radius: 5px;
+  font-size: 1rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 1rem;
+}
+
+.google-btn {
+  background-color: #db4437;
+  color: #fff;
+}
+
+.google-btn .icon {
+  width: 20px;
+  height: 20px;
+  margin-right: 10px;
+}
+
+.separator {
+  margin: 1.5rem 0;
+  display: flex;
+  align-items: center;
+  text-align: center;
+  color: #aaa;
+}
+
+.separator::before, .separator::after {
+  content: '';
+  flex: 1;
+  border-bottom: 1px solid #eee;
+}
+
+.separator:not(:empty)::before {
+  margin-right: .5em;
+}
+
+.separator:not(:empty)::after {
+  margin-left: .5em;
+}
+
+.form-group {
+  margin-bottom: 1rem;
+}
+
+.form-group input {
+  width: calc(100% - 20px);
+  padding: 0.8rem 10px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  font-size: 1rem;
+}
+
+.login-btn {
+  background-color: #2575fc;
+  color: #fff;
+  width: 100%;
+  padding: 0.8rem;
+  border: none;
+  border-radius: 5px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.login-btn:hover {
+  background-color: #1a5edb;
+}
+
+.signup-text {
+  margin-top: 1.5rem;
+  color: #555;
+}
+
+.signup-text a {
+  color: #2575fc;
+  text-decoration: none;
+}

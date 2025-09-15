@@ -1,0 +1,55 @@
+<div class="home-container">
+  <div class="header">
+    <h1>Welcome Home!</h1>
+    <button (click)="logout()" class="logout-btn">Logout</button>
+  </div>
+
+  <div *ngIf="currentUserId">
+    <p>Logged in as: {{ currentUserId }}</p>
+
+    <div *ngIf="!currentBoxId" class="box-actions">
+      <h2>Create or Join a Box</h2>
+
+      <div class="create-box">
+        <h3>Create New Box</h3>
+        <input type="text" [(ngModel)]="boxName" placeholder="Enter Box Name">
+        <button (click)="createBox()">Create Box</button>
+      </div>
+
+      <div class="join-box">
+        <h3>Join Existing Box</h3>
+        <input type="text" [(ngModel)]="joinBoxId" placeholder="Enter Box ID">
+        <button (click)="joinBox()">Join Box</button>
+      </div>
+    </div>
+
+    <div *ngIf="currentBoxId && currentBox" class="current-box-details">
+      <h2>Current Box: {{ currentBox.name }} (ID: {{ currentBoxId }})</h2>
+      <h3>Players:</h3>
+      <ul>
+        <li *ngFor="let playerKey of (currentBox.players | keyvalue)">
+          {{ playerKey.value.name }} ({{ playerKey.key }}): ${{ playerKey.value.money }}
+        </li>
+      </ul>
+
+      <!-- Money Transfer Section (Phase 2) -->
+      <div class="money-transfer">
+        <h3>Transfer Money</h3>
+        <select [(ngModel)]="selectedRecipientId">
+          <option [ngValue]="null" disabled>Select Recipient</option>
+          <ng-container *ngFor="let playerKey of (currentBox.players | keyvalue)">
+            <option *ngIf="playerKey.key !== currentUserId" [ngValue]="playerKey.key">
+              {{ playerKey.value.name }}
+            </option>
+          </ng-container>
+        </select>
+        <input type="number" [(ngModel)]="transferAmount" placeholder="Amount">
+        <button (click)="transferMoney(selectedRecipientId, transferAmount)">Transfer</button>
+      </div>
+    </div>
+  </div>
+
+  <div *ngIf="!currentUserId">
+    <p>Please log in to access the home page.</p>
+  </div>
+</div>
