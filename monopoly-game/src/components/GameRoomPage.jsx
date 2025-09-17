@@ -204,21 +204,13 @@ const GameRoomPage = () => {
   };
 
   return (
-    <div className="container mt-3">
-      <h2 className="text-center mb-4">Game Room: {roomData.name || roomId}
-        <button className="btn btn-info btn-sm ms-3" onClick={() => setShowShareModal(true)}>
+    <div className="container mt-2 mt-md-3">
+      <h2 className="text-center mb-3 mb-md-4">Game Room: {roomData.name || roomId}
+        <button className="btn btn-info btn-sm ms-2 ms-md-3" onClick={() => setShowShareModal(true)}>
           Share Room
         </button>
       </h2>
       {error && <div className="alert alert-danger">{error}</div>}
-
-      <div className="card mb-4">
-        <div className="card-header">Game Overview</div>
-        <div className="card-body">
-          <p className="card-text"><strong>Total Game Money (Bank):</strong> ${bank.balance}</p>
-          <p className="card-text"><strong>Current Turn:</strong> {roomData.players && roomData.players[roomData.turn] ? roomData.players[roomData.turn].name : 'N/A'}</p>
-        </div>
-      </div>
 
       {showShareModal && (
         <>
@@ -231,10 +223,10 @@ const GameRoomPage = () => {
                 </div>
                 <div className="modal-body text-center">
                   <p className="card-text">Share this code with your friends to invite them to the game:</p>
-                  <h3 className="mb-3">{roomId}</h3>
+                  <h3 className="mb-2 mb-md-3">{roomId}</h3>
                   {roomId && (
                     <div className="d-flex justify-content-center">
-                      <QRCode value={roomId} size={128} level="H" />
+                      <QRCode value={roomId} size={100} level="H" />
                     </div>
                   )}
                 </div>
@@ -248,85 +240,118 @@ const GameRoomPage = () => {
         </>
       )}
 
-      <div className="card mb-4">
-        <div className="card-header">Banking</div>
-        <div className="card-body">
-          {transferError && <div className="alert alert-danger">{transferError}</div>}
-          <form onSubmit={handleTransfer}>
-            <div className="mb-3">
-              <label htmlFor="recipientSelect" className="form-label">Transfer to:</label>
-              <select
-                id="recipientSelect"
-                className="form-select"
-                value={selectedRecipientId}
-                onChange={(e) => setSelectedRecipientId(e.target.value)}
-                required
-              >
-                <option value="">Select Recipient</option>
-                <option value={BANK_UID}>Bank</option>
-                {players.filter(([uid]) => uid !== user.uid).map(([uid, playerData]) => (
-                  <option key={uid} value={uid}>{playerData.name}</option>
-                ))}
-              </select>
-            </div>
-            <div className="mb-3">
-              <label htmlFor="transferAmountInput" className="form-label">Amount:</label>
-              <input
-                type="number"
-                id="transferAmountInput"
-                className="form-control"
-                value={transferAmount}
-                onChange={(e) => setTransferAmount(e.target.value)}
-                min="1"
-                required
-              />
-            </div>
-            <button type="submit" className="btn btn-primary">Transfer Money</button>
-          </form>
-        </div>
-      </div>
-
-      <div className="card mb-4">
-        <div className="card-header">Transaction Log</div>
-        <div className="card-body">
-          <ul className="list-group">
-            {roomData.log && Object.values(roomData.log).reverse().map((logEntry) => {
-              const sender = roomData.players[logEntry.from];
-              const recipient = logEntry.to === BANK_UID ? bank : roomData.players[logEntry.to];
-
-              return (
-                <li key={logEntry.timestamp} className="list-group-item d-flex align-items-center justify-content-between">
-                  <div className="d-flex align-items-center">
-                    {/* Sender Info */}
-                    <div className="d-flex flex-column align-items-center mx-2">
-                      {sender?.avatarURL && <img src={sender.avatarURL} alt="Avatar" className="rounded-circle mb-1" style={{ width: '30px', height: '30px', objectFit: 'cover' }} />}
-                      <small>{sender?.name}</small>
-                    </div>
-
-                    {/* Arrow and Amount */}
-                    <span className="mx-2 d-flex align-items-center">
-                      <i className="bi bi-arrow-right me-1"></i> {/* Assuming Bootstrap Icons are available */}
-                      <strong> ${logEntry.amount} </strong>
-                    </span>
-
-                    {/* Recipient Info */}
-                    <div className="d-flex flex-column align-items-center mx-2">
-                      {logEntry.to === BANK_UID ? (
-                        bank.avatarURL && <img src={bank.avatarURL} alt="Bank" className="rounded-circle mb-1" style={{ width: '30px', height: '30px', objectFit: 'cover' }} /> // Using bank.avatarURL
-                      ) : (
-                        recipient?.avatarURL && <img src={recipient.avatarURL} alt="Avatar" className="rounded-circle mb-1" style={{ width: '30px', height: '30px', objectFit: 'cover' }} />
-                      )}
-                      <small>{recipient?.name}</small>
-                    </div>
+      <div className="row">
+        {/* Left Column: Game Status and Players */}
+        <div className="col-lg-6 mb-3 mb-md-4">
+          <div className="card h-100">
+            <div className="card-header bg-primary text-white">Game Status</div>
+            <div className="card-body p-2 p-md-3">
+              <p className="card-text mb-1 mb-md-2"><strong>Total Game Money (Bank):</strong> ${bank.balance}</p>
+              <p className="card-text mb-1 mb-md-2"><strong>Current Turn:</strong> {roomData.players && roomData.players[roomData.turn] ? roomData.players[roomData.turn].name : 'N/A'}</p>
+              <hr className="my-2 my-md-3" />
+              <h5>Players</h5>
+              <div className="d-flex flex-wrap justify-content-around">
+                {players.map(([uid, playerData]) => (
+                  <div key={uid} className={`text-center m-1 p-1 p-md-2 border rounded ${uid === user.uid ? 'border-success' : ''}`} style={{ width: '90px' }}>
+                    {playerData.avatarURL && (
+                      <img
+                        src={playerData.avatarURL}
+                        alt="Avatar"
+                        className="rounded-circle mb-1"
+                        style={{ width: '40px', height: '40px', objectFit: 'cover' }}
+                      />
+                    )}
+                    <h6 className="mb-0" style={{ fontSize: '0.8rem' }}>{playerData.name}</h6>
+                    <p className="text-muted mb-0" style={{ fontSize: '0.7rem' }}>${playerData.balance}</p>
                   </div>
-                  <small className="text-muted">({new Date(logEntry.timestamp).toLocaleTimeString()})</small>
-                </li>
-              );
-            })}
-          </ul>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Right Column: Banking and Transaction Log */}
+        <div className="col-lg-6 mb-3 mb-md-4">
+          <div className="card mb-3 mb-md-4">
+            <div className="card-header bg-success text-white">Banking</div>
+            <div className="card-body p-2 p-md-3">
+              {transferError && <div className="alert alert-danger py-1 px-2" style={{ fontSize: '0.8rem' }}>{transferError}</div>}
+              <form onSubmit={handleTransfer}>
+                <div className="mb-2 mb-md-3">
+                  <label htmlFor="recipientSelect" className="form-label" style={{ fontSize: '0.9rem' }}>Transfer to:</label>
+                  <select
+                    id="recipientSelect"
+                    className="form-select form-select-sm"
+                    value={selectedRecipientId}
+                    onChange={(e) => setSelectedRecipientId(e.target.value)}
+                    required
+                  >
+                    <option value="">Select Recipient</option>
+                    <option value={BANK_UID}>Bank</option>
+                    {players.filter(([uid]) => uid !== user.uid).map(([uid, playerData]) => (
+                      <option key={uid} value={uid}>{playerData.name}</option>
+                    ))}
+                  </select>
+                </div>
+                <div className="mb-2 mb-md-3">
+                  <label htmlFor="transferAmountInput" className="form-label" style={{ fontSize: '0.9rem' }}>Amount:</label>
+                  <input
+                    type="number"
+                    id="transferAmountInput"
+                    className="form-control form-control-sm"
+                    value={transferAmount}
+                    onChange={(e) => setTransferAmount(e.target.value)}
+                    min="1"
+                    required
+                  />
+                </div>
+                <button type="submit" className="btn btn-primary btn-sm">Transfer Money</button>
+              </form>
+            </div>
+          </div>
+
+          <div className="card mb-3 mb-md-4">
+            <div className="card-header bg-info text-white">Transaction Log</div>
+            <div className="card-body p-2 p-md-3" style={{ maxHeight: '200px', overflowY: 'auto' }}>
+              <ul className="list-group list-group-flush">
+                {roomData.log && Object.values(roomData.log).reverse().map((logEntry) => {
+                  const sender = roomData.players[logEntry.from];
+                  const recipient = logEntry.to === BANK_UID ? bank : roomData.players[logEntry.to];
+
+                  return (
+                    <li key={logEntry.timestamp} className="list-group-item d-flex align-items-center justify-content-between py-1 px-0" style={{ fontSize: '0.8rem' }}>
+                      <div className="d-flex align-items-center">
+                        {/* Sender Info */}
+                        <div className="d-flex flex-column align-items-center mx-1">
+                          {sender?.avatarURL && <img src={sender.avatarURL} alt="Avatar" className="rounded-circle" style={{ width: '20px', height: '20px', objectFit: 'cover' }} />}
+                          <small>{sender?.name}</small>
+                        </div>
+
+                        {/* Arrow and Amount */}
+                        <span className="mx-1 d-flex align-items-center">
+                          <i className="bi bi-arrow-right me-1"></i>
+                          <strong> ${logEntry.amount} </strong>
+                        </span>
+
+                        {/* Recipient Info */}
+                        <div className="d-flex flex-column align-items-center mx-1">
+                          {logEntry.to === BANK_UID ? (
+                            bank.avatarURL && <img src={bank.avatarURL} alt="Bank" className="rounded-circle" style={{ width: '20px', height: '20px', objectFit: 'cover' }} />
+                          ) : (
+                            recipient?.avatarURL && <img src={recipient.avatarURL} alt="Avatar" className="rounded-circle" style={{ width: '20px', height: '20px', objectFit: 'cover' }} />
+                          )}
+                          <small>{recipient?.name}</small>
+                        </div>
+                      </div>
+                      <small className="text-muted">({new Date(logEntry.timestamp).toLocaleTimeString()})</small>
+                    </li>
+                  );
+                })}
+              </ul>
+            </div>
+          </div>
         </div>
       </div>
-
     </div>
   );
 };
