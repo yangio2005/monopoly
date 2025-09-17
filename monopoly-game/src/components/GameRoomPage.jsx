@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { Howl } from 'howler';
 import { useParams, useNavigate } from 'react-router-dom';
 import { auth, database, ref, onValue, set, push, update } from '../firebase';
 import { onAuthStateChanged } from 'firebase/auth';
@@ -22,6 +23,7 @@ const GameRoomPage = () => {
   const [showBankingModal, setShowBankingModal] = useState(false);
   const [isAnimating, setIsAnimating] = useState(false);
   const [animationDetails, setAnimationDetails] = useState(null);
+  const [transferSound] = useState(new Howl({ src: ['/coin.mp3'] })); // Using Howler.js
   const playerRefs = useRef({});
   const bankRef = useRef(null);
 
@@ -207,6 +209,7 @@ const GameRoomPage = () => {
 
       console.log("Updates object before set:", updates);
       await update(ref(database), updates);
+      transferSound.play(); // Play sound on successful transfer
       setTransferAmount('');
       // Do not clear selectedRecipientId immediately, it's needed for animation
       setShowBankingModal(false); // Close modal after successful transfer
