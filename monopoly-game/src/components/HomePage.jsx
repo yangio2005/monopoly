@@ -147,6 +147,13 @@ const HomePage = () => {
                 />
                 <button className="btn btn-primary w-100" onClick={joinRoom}>Join Room</button>
               </div>
+
+              <div className="mb-3">
+                <button className="btn btn-info w-100" onClick={() => navigate('/scan-qr')}>
+                  Scan QR Code to Join
+                </button>
+              </div>
+
             </div>
           </div>
         </div>

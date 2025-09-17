@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { auth, database, ref, onValue, set, push, update } from '../firebase';
 import { onAuthStateChanged } from 'firebase/auth';
+import QRCode from 'react-qr-code';
 
 const BANK_UID = '5VlGAMonohOlDfk4uuQ5mGr4eSZ2'; // Specific UID for the bank
 
@@ -16,6 +17,7 @@ const GameRoomPage = () => {
   const [selectedRecipientId, setSelectedRecipientId] = useState('');
   const [transferError, setTransferError] = useState('');
   const [bankAvatarURL, setBankAvatarURL] = useState('');
+  const [showShareModal, setShowShareModal] = useState(false);
 
   useEffect(() => {
     const unsubscribeAuth = onAuthStateChanged(auth, (currentUser) => {
@@ -203,7 +205,11 @@ const GameRoomPage = () => {
 
   return (
     <div className="container mt-3">
-      <h2 className="text-center mb-4">Game Room: {roomData.name || roomId}</h2>
+      <h2 className="text-center mb-4">Game Room: {roomData.name || roomId}
+        <button className="btn btn-info btn-sm ms-3" onClick={() => setShowShareModal(true)}>
+          Share Room
+        </button>
+      </h2>
       {error && <div className="alert alert-danger">{error}</div>}
 
       <div className="card mb-4">
@@ -214,22 +220,33 @@ const GameRoomPage = () => {
         </div>
       </div>
 
-      <div className="card mb-4">
-        <div className="card-header">Players</div>
-        <div className="card-body">
-          <ul className="list-group list-group-flush">
-            {players.map(([uid, playerData]) => (
-              <li key={uid} className="list-group-item d-flex justify-content-between align-items-center">
-                <div className="d-flex align-items-center">
-                  {playerData.avatarURL && <img src={playerData.avatarURL} alt="Avatar" className="rounded-circle me-2" style={{ width: '40px', height: '40px', objectFit: 'cover' }} />}
-                  <span>{playerData.name}</span>
+      {showShareModal && (
+        <>
+          <div className="modal fade show" id="shareRoomModal" tabIndex="-1" aria-labelledby="shareRoomModalLabel" aria-hidden="true" style={{ display: 'block' }}>
+            <div className="modal-dialog modal-dialog-centered">
+              <div className="modal-content">
+                <div className="modal-header">
+                  <h5 className="modal-title" id="shareRoomModalLabel">Share Game Room</h5>
+                  <button type="button" className="btn-close" onClick={() => setShowShareModal(false)} aria-label="Close"></button>
                 </div>
-                <span>Balance: ${playerData.balance}</span>
-              </li>
-            ))}
-          </ul>
-        </div>
-      </div>
+                <div className="modal-body text-center">
+                  <p className="card-text">Share this code with your friends to invite them to the game:</p>
+                  <h3 className="mb-3">{roomId}</h3>
+                  {roomId && (
+                    <div className="d-flex justify-content-center">
+                      <QRCode value={roomId} size={128} level="H" />
+                    </div>
+                  )}
+                </div>
+                <div className="modal-footer">
+                  <button type="button" className="btn btn-secondary" onClick={() => setShowShareModal(false)}>Close</button>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div className="modal-backdrop fade show"></div>
+        </>
+      )}
 
       <div className="card mb-4">
         <div className="card-header">Banking</div>

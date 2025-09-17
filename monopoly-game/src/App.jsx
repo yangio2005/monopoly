@@ -4,7 +4,8 @@ import LoginPage from './components/LoginPage';
 import HomePage from './components/HomePage';
 import Navbar from './components/Navbar';
 import ProfilePage from './components/ProfilePage';
-import GameRoomPage from './components/GameRoomPage'; // New import
+import GameRoomPage from './components/GameRoomPage';
+import QrScannerPage from './components/QrScannerPage';
 
 function App() {
   return (
@@ -14,7 +15,8 @@ function App() {
         <Route path="/" element={<HomePage />} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/profile" element={<ProfilePage />} />
-        <Route path="/room/:roomId" element={<GameRoomPage />} /> {/* New Route */}
+        <Route path="/room/:roomId" element={<GameRoomPage />} />
+        <Route path="/scan-qr" element={<QrScannerPage />} />
       </Routes>
     </Router>
   );
