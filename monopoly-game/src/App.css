@@ -1,3 +1,30 @@
 .money-animation {
   transition: transform 2.5s ease-in-out, opacity 2.5s ease-in-out;
 }
+
+@keyframes pulse-glow {
+  0% {
+    box-shadow: 0 0 0px rgba(0, 255, 0, 0.7);
+    transform: scale(1);
+    background-color: transparent; /* Start transparent */
+  }
+  25% {
+    box-shadow: 0 0 25px rgba(0, 255, 0, 1); /* More prominent glow */
+    transform: scale(1.05); /* Slightly larger scale */
+    background-color: rgba(0, 255, 0, 0.2); /* Brief background flash */
+  }
+  50% {
+    box-shadow: 0 0 0px rgba(0, 255, 0, 0.7);
+    transform: scale(1);
+    background-color: transparent;
+  }
+  100% {
+    box-shadow: 0 0 0px rgba(0, 255, 0, 0.7);
+    transform: scale(1);
+    background-color: transparent;
+  }
+}
+
+.money-received-effect {
+  animation: pulse-glow 2.5s ease-out forwards; /* Increased duration */
+}

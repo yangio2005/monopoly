@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { auth, database, ref, push, set, onValue } from '../firebase';
+import { onDisconnect } from 'firebase/database';
 import { onAuthStateChanged } from 'firebase/auth';
+import { Howl } from 'howler';
 
 const HomePage = () => {
   const [user, setUser] = useState(null);
@@ -10,6 +12,7 @@ const HomePage = () => {
   const [error, setError] = useState('');
   const [rooms, setRooms] = useState({}); // State to store available rooms
   const navigate = useNavigate();
+  const [clickSound] = useState(new Howl({ src: ['/click.mp3'] })); // Generic click sound
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
@@ -52,6 +55,7 @@ const HomePage = () => {
 
       const newRoomRef = push(ref(database, 'rooms'));
       const newRoomId = newRoomRef.key;
+      const playerRef = ref(database, `rooms/${newRoomId}/players/${user.uid}`);
       const initialPlayers = {
         [user.uid]: {
           name: playerName,
@@ -70,6 +74,7 @@ const HomePage = () => {
         bank: 100000,
         log: []
       });
+      onDisconnect(playerRef).remove();
       navigate(`/room/${newRoomId}`);
     } catch (e) {
       console.error("Error creating room: ", e);
@@ -102,14 +107,16 @@ const HomePage = () => {
         if (snapshot.exists()) {
           const roomData = snapshot.val();
           if (!roomData.players || !roomData.players[user.uid]) {
+            const playerRef = ref(database, `rooms/${targetRoomId}/players/${user.uid}`);
             // Add player to the room if not already there
-            await set(ref(database, `rooms/${targetRoomId}/players/${user.uid}`), {
+            await set(playerRef, {
               name: playerName,
               balance: 1500,
               position: 0,
               properties: {},
               avatarURL: playerAvatarURL // Include avatarURL
             });
+            onDisconnect(playerRef).remove();
           }
           navigate(`/room/${targetRoomId}`);
         } else {
@@ -145,7 +152,7 @@ const HomePage = () => {
                   onChange={(e) => setRoomName(e.target.value)}
                   required
                 />
-                <button className="btn btn-success w-100" onClick={createRoom}>Create New Room</button>
+                <button className="btn btn-success w-100" onClick={() => { createRoom(); clickSound.play(); }}>Create New Room</button>
               </div>
               <div className="mb-3">
                 <input
@@ -155,11 +162,11 @@ const HomePage = () => {
                   value={roomIdInput}
                   onChange={(e) => setRoomIdInput(e.target.value)}
                 />
-                <button className="btn btn-primary w-100" onClick={() => joinRoom(roomIdInput)}>Join Room</button>
+                <button className="btn btn-primary w-100" onClick={() => { joinRoom(roomIdInput); clickSound.play(); }}>Join Room</button>
               </div>
 
               <div className="mb-3">
-                <button className="btn btn-info w-100" onClick={() => navigate('/scan-qr')}>
+                <button className="btn btn-info w-100" onClick={() => { navigate('/scan-qr'); clickSound.play(); }}>
                   Scan QR Code to Join
                 </button>
               </div>
@@ -173,8 +180,8 @@ const HomePage = () => {
                 <ul className="list-group">
                   {Object.entries(rooms).map(([roomId, roomData]) => (
                     <li key={roomId} className="list-group-item d-flex justify-content-between align-items-center">
-                      {roomData.name} (ID: {roomId})
-                      <button className="btn btn-sm btn-primary" onClick={() => joinRoom(roomId)}>Join</button>
+                      {roomData.name} (ID: {roomId}) - Players: {roomData.players ? Object.keys(roomData.players).length : 0}
+                      <button className="btn btn-sm btn-primary" onClick={() => { joinRoom(roomId); clickSound.play(); }}>Join</button>
                     </li>
                   ))}
                 </ul>

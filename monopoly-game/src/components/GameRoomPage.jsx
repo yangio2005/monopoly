@@ -1,10 +1,11 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Howl } from 'howler';
 import { useParams, useNavigate } from 'react-router-dom';
-import { auth, database, ref, onValue, set, push, update } from '../firebase';
+import { auth, database, ref, onValue, set, push, update, onDisconnect } from '../firebase';
 import { onAuthStateChanged } from 'firebase/auth';
 import QRCode from 'react-qr-code';
 import MoneyTransferAnimation from './MoneyTransferAnimation';
+import CalculatorInput from './CalculatorInput';
 
 const BANK_UID = '5VlGAMonohOlDfk4uuQ5mGr4eSZ2'; // Specific UID for the bank
 
@@ -24,8 +25,18 @@ const GameRoomPage = () => {
   const [isAnimating, setIsAnimating] = useState(false);
   const [animationDetails, setAnimationDetails] = useState(null);
   const [transferSound] = useState(new Howl({ src: ['/coin.mp3'] })); // Using Howler.js
+  const [clickSound] = useState(new Howl({ src: ['/click.mp3'] })); // Generic click sound
+  const [moneyReceivedSound] = useState(new Howl({
+    src: ['/money_received.mp3'],
+    onload: () => console.log('money_received.mp3 loaded successfully!'),
+    onloaderror: (id, err) => console.error('Error loading money_received.mp3:', id, err),
+    onplayerror: (id, err) => console.error('Error playing money_received.mp3:', id, err),
+  })); // Sound for receiving money
   const playerRefs = useRef({});
   const bankRef = useRef(null);
+  const previousBalanceRef = useRef(0); // To track previous balance for sound effect
+  const isInitialMount = useRef(true); // New ref to track initial mount
+  const [receivedEffectPlayerId, setReceivedEffectPlayerId] = useState(null); // State to trigger visual effect
 
   useEffect(() => {
     const unsubscribeAuth = onAuthStateChanged(auth, (currentUser) => {
@@ -55,6 +66,42 @@ const GameRoomPage = () => {
     });
     return () => unsubscribeBankAvatar();
   }, []);
+
+  // Effect to play sound when money is received
+  useEffect(() => {
+    console.log("Money received sound effect running...");
+    if (user && roomData && roomData.players && roomData.players[user.uid]) {
+      const currentBalance = roomData.players[user.uid].balance;
+      console.log("User:", user.uid, "Current Balance:", currentBalance);
+
+      if (isInitialMount.current) {
+        console.log("Initial mount. Setting previous balance:", currentBalance);
+        previousBalanceRef.current = currentBalance;
+        isInitialMount.current = false;
+      } else {
+        const previousBalance = previousBalanceRef.current;
+        console.log("Previous Balance:", previousBalance);
+        console.log("Condition: currentBalance > previousBalance ->", currentBalance > previousBalance);
+
+        if (currentBalance > previousBalance) {
+          console.log("Balance increased! Playing money received sound.");
+          moneyReceivedSound.play();
+          setReceivedEffectPlayerId(user.uid); // Trigger visual effect for current user
+          setTimeout(() => {
+            setReceivedEffectPlayerId(null); // Clear effect after 1 second
+          }, 1000);
+        }
+        previousBalanceRef.current = currentBalance;
+        console.log("Updated previousBalanceRef.current:", previousBalanceRef.current);
+      }
+    } else {
+      console.log("Conditions not met for money received sound effect.");
+      console.log("User:", user);
+      console.log("RoomData:", roomData);
+    }
+    // Also check if the sound itself is loaded
+    console.log("moneyReceivedSound loaded:", moneyReceivedSound.state() === 'loaded');
+  }, [roomData, user, moneyReceivedSound]);
 
     useEffect(() => {
     if (user && roomId) {
@@ -117,7 +164,14 @@ const GameRoomPage = () => {
         setError("Failed to load room data.");
         setLoading(false);
       });
-      return () => unsubscribeRoom();
+      return () => {
+        unsubscribeRoom();
+        // Explicitly remove player from room when component unmounts
+        if (user && roomId) {
+          const playerInRoomRef = ref(database, `rooms/${roomId}/players/${user.uid}`);
+          set(playerInRoomRef, null);
+        }
+      };
     }
   }, [user, roomId, navigate]);
 
@@ -258,7 +312,7 @@ const GameRoomPage = () => {
     <>
       <div className="container mt-2 mt-md-3">
         <h2 className="text-center mb-3 mb-md-4">Game Room: {roomData.name || roomId}
-          <button className="btn btn-info btn-sm ms-2 ms-md-3" onClick={() => setShowShareModal(true)}>
+          <button className="btn btn-info btn-sm ms-2 ms-md-3" onClick={() => { setShowShareModal(true); clickSound.play(); }}>
             Share Room
           </button>
         </h2>
@@ -266,12 +320,12 @@ const GameRoomPage = () => {
 
         {showShareModal && (
           <>
-            <div className="modal fade show" id="shareRoomModal" tabIndex="-1" aria-labelledby="shareRoomModalLabel" aria-hidden="true" style={{ display: 'block' }}>
+            <div className="modal fade show" id="shareRoomModal" tabIndex="-1" aria-labelledby="shareRoomModalLabel" aria-hidden="false" style={{ display: 'block' }}>
               <div className="modal-dialog modal-dialog-centered">
                 <div className="modal-content">
                   <div className="modal-header">
                     <h5 className="modal-title" id="shareRoomModalLabel">Share Game Room</h5>
-                    <button type="button" className="btn-close" onClick={() => setShowShareModal(false)} aria-label="Close"></button>
+                    <button type="button" className="btn-close" onClick={() => { setShowShareModal(false); clickSound.play(); }} aria-label="Close"></button>
                   </div>
                   <div className="modal-body text-center">
                     <p className="card-text">Share this code with your friends to invite them to the game:</p>
@@ -283,7 +337,7 @@ const GameRoomPage = () => {
                     )}
                   </div>
                   <div className="modal-footer">
-                    <button type="button" className="btn btn-secondary" onClick={() => setShowShareModal(false)}>Close</button>
+                    <button type="button" className="btn btn-secondary" onClick={() => { setShowShareModal(false); clickSound.play(); }}>Close</button>
                   </div>
                 </div>
               </div>
@@ -302,7 +356,7 @@ const GameRoomPage = () => {
                   <button
                     ref={bankRef}
                     className={`btn btn-light text-start p-0 mb-1 mb-md-2 ${selectedRecipientId === BANK_UID ? 'border-warning shadow' : ''}`}
-                    onClick={() => { setSelectedRecipientId(BANK_UID); setShowBankingModal(true); }}
+                    onClick={() => { setSelectedRecipientId(BANK_UID); setShowBankingModal(true); clickSound.play(); }}
                   >
                     <strong>Total Game Money (Bank):</strong> ${bank.balance}
                   </button>
@@ -321,10 +375,11 @@ const GameRoomPage = () => {
                     <button
                       ref={el => playerRefs.current[uid] = el}
                       key={uid}
-                      className={`text-center p-1 border rounded btn btn-light position-absolute ${uid === user.uid ? 'border-success' : ''} ${selectedRecipientId === uid ? 'border-warning shadow' : ''}`}
+                      className={`text-center p-1 border rounded btn btn-light position-absolute ${uid === user.uid ? 'border-success' : ''} ${selectedRecipientId === uid ? 'border-warning shadow' : ''} ${uid === receivedEffectPlayerId ? 'money-received-effect' : ''}`}
                       style={{ width: '120px', ...position }}
-                      onClick={() => { setSelectedRecipientId(uid); setShowBankingModal(true); }}
+                      onClick={() => { setSelectedRecipientId(uid); setShowBankingModal(true); clickSound.play(); }}
                     >
+                      {console.log(`Player ${uid}: receivedEffectPlayerId=${receivedEffectPlayerId}, classApplied=${uid === receivedEffectPlayerId ? 'money-received-effect' : ''}, fullClass=${`text-center p-1 border rounded btn btn-light position-absolute ${uid === user.uid ? 'border-success' : ''} ${selectedRecipientId === uid ? 'border-warning shadow' : ''} ${uid === receivedEffectPlayerId ? 'money-received-effect' : ''}`}`)}
                       {playerData.avatarURL && (
                         <img
                           src={playerData.avatarURL}
@@ -348,12 +403,12 @@ const GameRoomPage = () => {
             {/* Banking Modal */}
             {showBankingModal && (
               <>
-                <div className="modal fade show" id="bankingModal" tabIndex="-1" aria-labelledby="bankingModalLabel" aria-hidden="true" style={{ display: 'block' }}>
+                <div className="modal fade show" id="bankingModal" tabIndex="-1" aria-labelledby="bankingModalLabel" aria-hidden="false" style={{ display: 'block' }}>
                   <div className="modal-dialog modal-dialog-centered">
                     <div className="modal-content">
                       <div className="modal-header bg-success text-white">
                         <h5 className="modal-title" id="bankingModalLabel">Transfer Money</h5>
-                        <button type="button" className="btn-close btn-close-white" onClick={() => setShowBankingModal(false)} aria-label="Close"></button>
+                        <button type="button" className="btn-close btn-close-white" onClick={() => { setShowBankingModal(false); clickSound.play(); }} aria-label="Close"></button>
                       </div>
                       <div className="modal-body p-2 p-md-3">
                         {transferError && <div className="alert alert-danger py-1 px-2" style={{ fontSize: '0.8rem' }}>{transferError}</div>}
@@ -377,21 +432,16 @@ const GameRoomPage = () => {
                           </div>
                           <div className="mb-2 mb-md-3">
                             <label htmlFor="transferAmountInput" className="form-label" style={{ fontSize: '0.9rem' }}>Amount:</label>
-                            <input
-                              type="number"
-                              id="transferAmountInput"
-                              className="form-control form-control-sm"
+                            <CalculatorInput
                               value={transferAmount}
-                              onChange={(e) => setTransferAmount(e.target.value)}
-                              min="1"
-                              required
+                              onChange={setTransferAmount}
                             />
                           </div>
-                          <button type="submit" className="btn btn-primary btn-sm">Transfer Money</button>
+                          <button type="submit" className="btn btn-primary btn-sm" onClick={() => clickSound.play()}>Transfer Money</button>
                         </form>
                       </div>
                       <div className="modal-footer">
-                        <button type="button" className="btn btn-secondary btn-sm" onClick={() => setShowBankingModal(false)}>Cancel</button>
+                        <button type="button" className="btn btn-secondary btn-sm" onClick={() => { setShowBankingModal(false); clickSound.play(); }}>Cancel</button>
                       </div>
                     </div>
                   </div>
