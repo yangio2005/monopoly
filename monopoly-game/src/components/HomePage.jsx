@@ -8,6 +8,7 @@ const HomePage = () => {
   const [roomIdInput, setRoomIdInput] = useState('');
   const [roomName, setRoomName] = useState(''); // New state for room name
   const [error, setError] = useState('');
+  const [rooms, setRooms] = useState({}); // State to store available rooms
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -21,6 +22,14 @@ const HomePage = () => {
     });
     return () => unsubscribe();
   }, [navigate]);
+
+  useEffect(() => {
+    const roomsRef = ref(database, 'rooms');
+    onValue(roomsRef, (snapshot) => {
+      const data = snapshot.val();
+      setRooms(data || {});
+    });
+  }, []);
 
   const createRoom = async () => {
     if (!user) {
@@ -68,13 +77,14 @@ const HomePage = () => {
     }
   };
 
-  const joinRoom = async () => {
+  const joinRoom = async (roomIdToJoin) => {
+    const targetRoomId = roomIdToJoin || roomIdInput;
     if (!user) {
       setError("You must be logged in to join a room.");
       return;
     }
-    if (!roomIdInput) {
-      setError("Please enter a Room ID.");
+    if (!targetRoomId) {
+      setError("Please enter a Room ID or select a room from the list.");
       return;
     }
     setError('');
@@ -87,13 +97,13 @@ const HomePage = () => {
       const playerName = userProfile?.name || user.displayName || user.email;
       const playerAvatarURL = userProfile?.avatarURL || ''; // Get avatarURL
 
-      const roomRef = ref(database, `rooms/${roomIdInput}`);
+      const roomRef = ref(database, `rooms/${targetRoomId}`);
       onValue(roomRef, async (snapshot) => {
         if (snapshot.exists()) {
           const roomData = snapshot.val();
           if (!roomData.players || !roomData.players[user.uid]) {
             // Add player to the room if not already there
-            await set(ref(database, `rooms/${roomIdInput}/players/${user.uid}`), {
+            await set(ref(database, `rooms/${targetRoomId}/players/${user.uid}`), {
               name: playerName,
               balance: 1500,
               position: 0,
@@ -101,7 +111,7 @@ const HomePage = () => {
               avatarURL: playerAvatarURL // Include avatarURL
             });
           }
-          navigate(`/room/${roomIdInput}`);
+          navigate(`/room/${targetRoomId}`);
         } else {
           setError("Room does not exist.");
         }
@@ -145,7 +155,7 @@ const HomePage = () => {
                   value={roomIdInput}
                   onChange={(e) => setRoomIdInput(e.target.value)}
                 />
-                <button className="btn btn-primary w-100" onClick={joinRoom}>Join Room</button>
+                <button className="btn btn-primary w-100" onClick={() => joinRoom(roomIdInput)}>Join Room</button>
               </div>
 
               <div className="mb-3">
@@ -154,6 +164,21 @@ const HomePage = () => {
                 </button>
               </div>
 
+              <hr />
+
+              <h5 className="card-title mt-4">Available Rooms</h5>
+              {Object.keys(rooms).length === 0 ? (
+                <p>No rooms available. Create one!</p>
+              ) : (
+                <ul className="list-group">
+                  {Object.entries(rooms).map(([roomId, roomData]) => (
+                    <li key={roomId} className="list-group-item d-flex justify-content-between align-items-center">
+                      {roomData.name} (ID: {roomId})
+                      <button className="btn btn-sm btn-primary" onClick={() => joinRoom(roomId)}>Join</button>
+                    </li>
+                  ))}
+                </ul>
+              )}
             </div>
           </div>
         </div>
