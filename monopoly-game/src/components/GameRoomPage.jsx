@@ -18,6 +18,7 @@ const GameRoomPage = () => {
   const [transferError, setTransferError] = useState('');
   const [bankAvatarURL, setBankAvatarURL] = useState('');
   const [showShareModal, setShowShareModal] = useState(false);
+  const [showBankingModal, setShowBankingModal] = useState(false);
 
   useEffect(() => {
     const unsubscribeAuth = onAuthStateChanged(auth, (currentUser) => {
@@ -29,6 +30,13 @@ const GameRoomPage = () => {
     });
     return () => unsubscribeAuth();
   }, [navigate]);
+
+  useEffect(() => {
+    // No longer need to scroll to bankingRef as it's a modal
+    // if (selectedRecipientId && bankingRef.current) {
+    //   bankingRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    // }
+  }, [selectedRecipientId]);
 
   useEffect(() => {
     const bankProfileRef = ref(database, `users/${BANK_UID}/avatarURL`);
@@ -196,6 +204,7 @@ const GameRoomPage = () => {
       await update(ref(database), updates);
       setTransferAmount('');
       setSelectedRecipientId('');
+      setShowBankingModal(false); // Close modal after successful transfer
       alert("Transfer successful!");
     } catch (e) {
       console.error("Error during transfer:", e);
@@ -246,13 +255,23 @@ const GameRoomPage = () => {
           <div className="card h-100">
             <div className="card-header bg-primary text-white">Game Status</div>
             <div className="card-body p-2 p-md-3">
-              <p className="card-text mb-1 mb-md-2"><strong>Total Game Money (Bank):</strong> ${bank.balance}</p>
+              <button
+                className={`btn btn-light text-start p-0 mb-1 mb-md-2 ${selectedRecipientId === BANK_UID ? 'border-warning shadow' : ''}`}
+                onClick={() => { setSelectedRecipientId(BANK_UID); setShowBankingModal(true); }}
+              >
+                <strong>Total Game Money (Bank):</strong> ${bank.balance}
+              </button>
               <p className="card-text mb-1 mb-md-2"><strong>Current Turn:</strong> {roomData.players && roomData.players[roomData.turn] ? roomData.players[roomData.turn].name : 'N/A'}</p>
               <hr className="my-2 my-md-3" />
               <h5>Players</h5>
               <div className="d-flex flex-wrap justify-content-around">
                 {players.map(([uid, playerData]) => (
-                  <div key={uid} className={`text-center m-1 p-1 p-md-2 border rounded ${uid === user.uid ? 'border-success' : ''}`} style={{ width: '90px' }}>
+                  <button
+                    key={uid}
+                    className={`text-center m-1 p-1 p-md-2 border rounded btn btn-light ${uid === user.uid ? 'border-success' : ''} ${selectedRecipientId === uid ? 'border-warning shadow' : ''}`}
+                    style={{ width: '90px' }}
+                    onClick={() => { setSelectedRecipientId(uid); setShowBankingModal(true); }}
+                  >
                     {playerData.avatarURL && (
                       <img
                         src={playerData.avatarURL}
@@ -263,7 +282,7 @@ const GameRoomPage = () => {
                     )}
                     <h6 className="mb-0" style={{ fontSize: '0.8rem' }}>{playerData.name}</h6>
                     <p className="text-muted mb-0" style={{ fontSize: '0.7rem' }}>${playerData.balance}</p>
-                  </div>
+                  </button>
                 ))}
               </div>
             </div>
@@ -272,43 +291,61 @@ const GameRoomPage = () => {
 
         {/* Right Column: Banking and Transaction Log */}
         <div className="col-lg-6 mb-3 mb-md-4">
-          <div className="card mb-3 mb-md-4">
-            <div className="card-header bg-success text-white">Banking</div>
-            <div className="card-body p-2 p-md-3">
-              {transferError && <div className="alert alert-danger py-1 px-2" style={{ fontSize: '0.8rem' }}>{transferError}</div>}
-              <form onSubmit={handleTransfer}>
-                <div className="mb-2 mb-md-3">
-                  <label htmlFor="recipientSelect" className="form-label" style={{ fontSize: '0.9rem' }}>Transfer to:</label>
-                  <select
-                    id="recipientSelect"
-                    className="form-select form-select-sm"
-                    value={selectedRecipientId}
-                    onChange={(e) => setSelectedRecipientId(e.target.value)}
-                    required
-                  >
-                    <option value="">Select Recipient</option>
-                    <option value={BANK_UID}>Bank</option>
-                    {players.filter(([uid]) => uid !== user.uid).map(([uid, playerData]) => (
-                      <option key={uid} value={uid}>{playerData.name}</option>
-                    ))}
-                  </select>
+
+          {/* Banking Modal */}
+          {showBankingModal && (
+            <>
+              <div className="modal fade show" id="bankingModal" tabIndex="-1" aria-labelledby="bankingModalLabel" aria-hidden="true" style={{ display: 'block' }}>
+                <div className="modal-dialog modal-dialog-centered">
+                  <div className="modal-content">
+                    <div className="modal-header bg-success text-white">
+                      <h5 className="modal-title" id="bankingModalLabel">Transfer Money</h5>
+                      <button type="button" className="btn-close btn-close-white" onClick={() => setShowBankingModal(false)} aria-label="Close"></button>
+                    </div>
+                    <div className="modal-body p-2 p-md-3">
+                      {transferError && <div className="alert alert-danger py-1 px-2" style={{ fontSize: '0.8rem' }}>{transferError}</div>}
+                      <form onSubmit={handleTransfer}>
+                        <div className="mb-2 mb-md-3">
+                          <label htmlFor="recipientSelect" className="form-label" style={{ fontSize: '0.9rem' }}>Transfer to:</label>
+                          <select
+                            id="recipientSelect"
+                            className="form-select form-select-sm"
+                            value={selectedRecipientId}
+                            onChange={(e) => setSelectedRecipientId(e.target.value)}
+                            required
+                            disabled // Disable dropdown as recipient is selected by click
+                          >
+                            <option value="">Select Recipient</option>
+                            <option value={BANK_UID}>Bank</option>
+                            {players.filter(([uid]) => uid !== user.uid).map(([uid, playerData]) => (
+                              <option key={uid} value={uid}>{playerData.name}</option>
+                            ))}
+                          </select>
+                        </div>
+                        <div className="mb-2 mb-md-3">
+                          <label htmlFor="transferAmountInput" className="form-label" style={{ fontSize: '0.9rem' }}>Amount:</label>
+                          <input
+                            type="number"
+                            id="transferAmountInput"
+                            className="form-control form-control-sm"
+                            value={transferAmount}
+                            onChange={(e) => setTransferAmount(e.target.value)}
+                            min="1"
+                            required
+                          />
+                        </div>
+                        <button type="submit" className="btn btn-primary btn-sm">Transfer Money</button>
+                      </form>
+                    </div>
+                    <div className="modal-footer">
+                      <button type="button" className="btn btn-secondary btn-sm" onClick={() => setShowBankingModal(false)}>Cancel</button>
+                    </div>
+                  </div>
                 </div>
-                <div className="mb-2 mb-md-3">
-                  <label htmlFor="transferAmountInput" className="form-label" style={{ fontSize: '0.9rem' }}>Amount:</label>
-                  <input
-                    type="number"
-                    id="transferAmountInput"
-                    className="form-control form-control-sm"
-                    value={transferAmount}
-                    onChange={(e) => setTransferAmount(e.target.value)}
-                    min="1"
-                    required
-                  />
-                </div>
-                <button type="submit" className="btn btn-primary btn-sm">Transfer Money</button>
-              </form>
-            </div>
-          </div>
+              </div>
+              <div className="modal-backdrop fade show"></div>
+            </>
+          )}
 
           <div className="card mb-3 mb-md-4">
             <div className="card-header bg-info text-white">Transaction Log</div>
