@@ -1,0 +1,4 @@
+.money-animation {
+  transition: transform 2.5s ease-in-out, opacity 2.5s ease-in-out;
+  transform: translate(var(--translate-x, 0), var(--translate-y, 0));
+}

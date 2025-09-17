@@ -1,8 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { auth, database, ref, onValue, set, push, update } from '../firebase';
 import { onAuthStateChanged } from 'firebase/auth';
 import QRCode from 'react-qr-code';
+import MoneyTransferAnimation from './MoneyTransferAnimation';
 
 const BANK_UID = '5VlGAMonohOlDfk4uuQ5mGr4eSZ2'; // Specific UID for the bank
 
@@ -19,6 +20,10 @@ const GameRoomPage = () => {
   const [bankAvatarURL, setBankAvatarURL] = useState('');
   const [showShareModal, setShowShareModal] = useState(false);
   const [showBankingModal, setShowBankingModal] = useState(false);
+  const [isAnimating, setIsAnimating] = useState(false);
+  const [animationDetails, setAnimationDetails] = useState(null);
+  const playerRefs = useRef({});
+  const bankRef = useRef(null);
 
   useEffect(() => {
     const unsubscribeAuth = onAuthStateChanged(auth, (currentUser) => {
@@ -203,8 +208,42 @@ const GameRoomPage = () => {
       console.log("Updates object before set:", updates);
       await update(ref(database), updates);
       setTransferAmount('');
-      setSelectedRecipientId('');
+      // Do not clear selectedRecipientId immediately, it's needed for animation
       setShowBankingModal(false); // Close modal after successful transfer
+
+      // Trigger animation
+      const senderElement = playerRefs.current[user.uid];
+      const recipientElement = selectedRecipientId === BANK_UID ? bankRef.current : playerRefs.current[selectedRecipientId];
+
+      if (senderElement && recipientElement) {
+        const senderRect = senderElement.getBoundingClientRect();
+        const recipientRect = recipientElement.getBoundingClientRect();
+
+        const senderPos = {
+          x: senderRect.left + senderRect.width / 2,
+          y: senderRect.top + senderRect.height / 2,
+        };
+        const recipientPos = {
+          x: recipientRect.left + recipientRect.width / 2,
+          y: recipientRect.top + recipientRect.height / 2,
+        };
+
+        setAnimationDetails({
+          senderPos,
+          recipientPos,
+          amount: amount,
+        });
+        setIsAnimating(true);
+
+        setTimeout(() => {
+          setIsAnimating(false);
+          setAnimationDetails(null);
+          setSelectedRecipientId(''); // Clear selected recipient after animation
+        }, 2500); // Animation duration
+      } else {
+        setSelectedRecipientId(''); // Clear selected recipient if elements not found
+      }
+
       alert("Transfer successful!");
     } catch (e) {
       console.error("Error during transfer:", e);
@@ -213,183 +252,197 @@ const GameRoomPage = () => {
   };
 
   return (
-    <div className="container mt-2 mt-md-3">
-      <h2 className="text-center mb-3 mb-md-4">Game Room: {roomData.name || roomId}
-        <button className="btn btn-info btn-sm ms-2 ms-md-3" onClick={() => setShowShareModal(true)}>
-          Share Room
-        </button>
-      </h2>
-      {error && <div className="alert alert-danger">{error}</div>}
+    <>
+      <div className="container mt-2 mt-md-3">
+        <h2 className="text-center mb-3 mb-md-4">Game Room: {roomData.name || roomId}
+          <button className="btn btn-info btn-sm ms-2 ms-md-3" onClick={() => setShowShareModal(true)}>
+            Share Room
+          </button>
+        </h2>
+        {error && <div className="alert alert-danger">{error}</div>}
 
-      {showShareModal && (
-        <>
-          <div className="modal fade show" id="shareRoomModal" tabIndex="-1" aria-labelledby="shareRoomModalLabel" aria-hidden="true" style={{ display: 'block' }}>
-            <div className="modal-dialog modal-dialog-centered">
-              <div className="modal-content">
-                <div className="modal-header">
-                  <h5 className="modal-title" id="shareRoomModalLabel">Share Game Room</h5>
-                  <button type="button" className="btn-close" onClick={() => setShowShareModal(false)} aria-label="Close"></button>
-                </div>
-                <div className="modal-body text-center">
-                  <p className="card-text">Share this code with your friends to invite them to the game:</p>
-                  <h3 className="mb-2 mb-md-3">{roomId}</h3>
-                  {roomId && (
-                    <div className="d-flex justify-content-center">
-                      <QRCode value={roomId} size={100} level="H" />
-                    </div>
-                  )}
-                </div>
-                <div className="modal-footer">
-                  <button type="button" className="btn btn-secondary" onClick={() => setShowShareModal(false)}>Close</button>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div className="modal-backdrop fade show"></div>
-        </>
-      )}
-
-      <div className="row">
-        {/* Left Column: Game Status and Players */}
-        <div className="col-lg-6 mb-3 mb-md-4">
-          <div className="card h-100">
-            <div className="card-header bg-primary text-white">Game Status</div>
-            <div className="card-body p-2 p-md-3">
-              <button
-                className={`btn btn-light text-start p-0 mb-1 mb-md-2 ${selectedRecipientId === BANK_UID ? 'border-warning shadow' : ''}`}
-                onClick={() => { setSelectedRecipientId(BANK_UID); setShowBankingModal(true); }}
-              >
-                <strong>Total Game Money (Bank):</strong> ${bank.balance}
-              </button>
-              <p className="card-text mb-1 mb-md-2"><strong>Current Turn:</strong> {roomData.players && roomData.players[roomData.turn] ? roomData.players[roomData.turn].name : 'N/A'}</p>
-              <hr className="my-2 my-md-3" />
-              <h5>Players</h5>
-              <div className="d-flex flex-wrap justify-content-around">
-                {players.map(([uid, playerData]) => (
-                  <button
-                    key={uid}
-                    className={`text-center m-1 p-1 p-md-2 border rounded btn btn-light ${uid === user.uid ? 'border-success' : ''} ${selectedRecipientId === uid ? 'border-warning shadow' : ''}`}
-                    style={{ width: '90px' }}
-                    onClick={() => { setSelectedRecipientId(uid); setShowBankingModal(true); }}
-                  >
-                    {playerData.avatarURL && (
-                      <img
-                        src={playerData.avatarURL}
-                        alt="Avatar"
-                        className="rounded-circle mb-1"
-                        style={{ width: '40px', height: '40px', objectFit: 'cover' }}
-                      />
+        {showShareModal && (
+          <>
+            <div className="modal fade show" id="shareRoomModal" tabIndex="-1" aria-labelledby="shareRoomModalLabel" aria-hidden="true" style={{ display: 'block' }}>
+              <div className="modal-dialog modal-dialog-centered">
+                <div className="modal-content">
+                  <div className="modal-header">
+                    <h5 className="modal-title" id="shareRoomModalLabel">Share Game Room</h5>
+                    <button type="button" className="btn-close" onClick={() => setShowShareModal(false)} aria-label="Close"></button>
+                  </div>
+                  <div className="modal-body text-center">
+                    <p className="card-text">Share this code with your friends to invite them to the game:</p>
+                    <h3 className="mb-2 mb-md-3">{roomId}</h3>
+                    {roomId && (
+                      <div className="d-flex justify-content-center">
+                        <QRCode value={roomId} size={100} level="H" />
+                      </div>
                     )}
-                    <h6 className="mb-0" style={{ fontSize: '0.8rem' }}>{playerData.name}</h6>
-                    <p className="text-muted mb-0" style={{ fontSize: '0.7rem' }}>${playerData.balance}</p>
-                  </button>
-                ))}
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Right Column: Banking and Transaction Log */}
-        <div className="col-lg-6 mb-3 mb-md-4">
-
-          {/* Banking Modal */}
-          {showBankingModal && (
-            <>
-              <div className="modal fade show" id="bankingModal" tabIndex="-1" aria-labelledby="bankingModalLabel" aria-hidden="true" style={{ display: 'block' }}>
-                <div className="modal-dialog modal-dialog-centered">
-                  <div className="modal-content">
-                    <div className="modal-header bg-success text-white">
-                      <h5 className="modal-title" id="bankingModalLabel">Transfer Money</h5>
-                      <button type="button" className="btn-close btn-close-white" onClick={() => setShowBankingModal(false)} aria-label="Close"></button>
-                    </div>
-                    <div className="modal-body p-2 p-md-3">
-                      {transferError && <div className="alert alert-danger py-1 px-2" style={{ fontSize: '0.8rem' }}>{transferError}</div>}
-                      <form onSubmit={handleTransfer}>
-                        <div className="mb-2 mb-md-3">
-                          <label htmlFor="recipientSelect" className="form-label" style={{ fontSize: '0.9rem' }}>Transfer to:</label>
-                          <select
-                            id="recipientSelect"
-                            className="form-select form-select-sm"
-                            value={selectedRecipientId}
-                            onChange={(e) => setSelectedRecipientId(e.target.value)}
-                            required
-                            disabled // Disable dropdown as recipient is selected by click
-                          >
-                            <option value="">Select Recipient</option>
-                            <option value={BANK_UID}>Bank</option>
-                            {players.filter(([uid]) => uid !== user.uid).map(([uid, playerData]) => (
-                              <option key={uid} value={uid}>{playerData.name}</option>
-                            ))}
-                          </select>
-                        </div>
-                        <div className="mb-2 mb-md-3">
-                          <label htmlFor="transferAmountInput" className="form-label" style={{ fontSize: '0.9rem' }}>Amount:</label>
-                          <input
-                            type="number"
-                            id="transferAmountInput"
-                            className="form-control form-control-sm"
-                            value={transferAmount}
-                            onChange={(e) => setTransferAmount(e.target.value)}
-                            min="1"
-                            required
-                          />
-                        </div>
-                        <button type="submit" className="btn btn-primary btn-sm">Transfer Money</button>
-                      </form>
-                    </div>
-                    <div className="modal-footer">
-                      <button type="button" className="btn btn-secondary btn-sm" onClick={() => setShowBankingModal(false)}>Cancel</button>
-                    </div>
+                  </div>
+                  <div className="modal-footer">
+                    <button type="button" className="btn btn-secondary" onClick={() => setShowShareModal(false)}>Close</button>
                   </div>
                 </div>
               </div>
-              <div className="modal-backdrop fade show"></div>
-            </>
-          )}
+            </div>
+            <div className="modal-backdrop fade show"></div>
+          </>
+        )}
 
-          <div className="card mb-3 mb-md-4">
-            <div className="card-header bg-info text-white">Transaction Log</div>
-            <div className="card-body p-2 p-md-3" style={{ maxHeight: '200px', overflowY: 'auto' }}>
-              <ul className="list-group list-group-flush">
-                {roomData.log && Object.values(roomData.log).reverse().map((logEntry) => {
-                  const sender = roomData.players[logEntry.from];
-                  const recipient = logEntry.to === BANK_UID ? bank : roomData.players[logEntry.to];
+        <div className="row">
+          {/* Left Column: Game Status and Players */}
+          <div className="col-lg-6 mb-3 mb-md-4">
+            <div className="card h-100">
+              <div className="card-header bg-primary text-white">Game Status</div>
+              <div className="card-body p-2 p-md-3 position-relative" style={{ minHeight: '300px' }}>
+                                <div className="position-absolute top-50 start-50 translate-middle text-center">
+                  <button
+                    ref={bankRef}
+                    className={`btn btn-light text-start p-0 mb-1 mb-md-2 ${selectedRecipientId === BANK_UID ? 'border-warning shadow' : ''}`}
+                    onClick={() => { setSelectedRecipientId(BANK_UID); setShowBankingModal(true); }}
+                  >
+                    <strong>Total Game Money (Bank):</strong> ${bank.balance}
+                  </button>
+                </div>
+                {/* Player positions will be added here */}
+                {players.map(([uid, playerData], index) => {
+                  const playerPositions = [
+                    { top: '10px', left: '10px' },     // Top-left
+                    { top: '10px', right: '10px' },    // Top-right
+                    { bottom: '10px', left: '10px' },  // Bottom-left
+                    { bottom: '10px', right: '10px' } // Bottom-right
+                  ];
+                  const position = playerPositions[index % playerPositions.length];
 
                   return (
-                    <li key={logEntry.timestamp} className="list-group-item d-flex align-items-center justify-content-between py-1 px-0" style={{ fontSize: '0.8rem' }}>
-                      <div className="d-flex align-items-center">
-                        {/* Sender Info */}
-                        <div className="d-flex flex-column align-items-center mx-1">
-                          {sender?.avatarURL && <img src={sender.avatarURL} alt="Avatar" className="rounded-circle" style={{ width: '20px', height: '20px', objectFit: 'cover' }} />}
-                          <small>{sender?.name}</small>
-                        </div>
-
-                        {/* Arrow and Amount */}
-                        <span className="mx-1 d-flex align-items-center">
-                          <i className="bi bi-arrow-right me-1"></i>
-                          <strong> ${logEntry.amount} </strong>
-                        </span>
-
-                        {/* Recipient Info */}
-                        <div className="d-flex flex-column align-items-center mx-1">
-                          {logEntry.to === BANK_UID ? (
-                            bank.avatarURL && <img src={bank.avatarURL} alt="Bank" className="rounded-circle" style={{ width: '20px', height: '20px', objectFit: 'cover' }} />
-                          ) : (
-                            recipient?.avatarURL && <img src={recipient.avatarURL} alt="Avatar" className="rounded-circle" style={{ width: '20px', height: '20px', objectFit: 'cover' }} />
-                          )}
-                          <small>{recipient?.name}</small>
-                        </div>
-                      </div>
-                      <small className="text-muted">({new Date(logEntry.timestamp).toLocaleTimeString()})</small>
-                    </li>
+                    <button
+                      ref={el => playerRefs.current[uid] = el}
+                      key={uid}
+                      className={`text-center p-1 border rounded btn btn-light position-absolute ${uid === user.uid ? 'border-success' : ''} ${selectedRecipientId === uid ? 'border-warning shadow' : ''}`}
+                      style={{ width: '120px', ...position }}
+                      onClick={() => { setSelectedRecipientId(uid); setShowBankingModal(true); }}
+                    >
+                      {playerData.avatarURL && (
+                        <img
+                          src={playerData.avatarURL}
+                          alt="Avatar"
+                          className="rounded-circle mb-1"
+                          style={{ width: '45px', height: '45px', objectFit: 'cover' }}
+                        />
+                      )}
+                      <h6 className="mb-0" style={{ fontSize: '1.05rem' }}>{playerData.name}</h6>
+                      <p className="text-muted mb-0" style={{ fontSize: '0.9rem' }}>${playerData.balance}</p>
+                    </button>
                   );
                 })}
-              </ul>
+              </div>
+            </div>
+          </div>
+
+          {/* Right Column: Banking and Transaction Log */}
+          <div className="col-lg-6 mb-3 mb-md-4">
+
+            {/* Banking Modal */}
+            {showBankingModal && (
+              <>
+                <div className="modal fade show" id="bankingModal" tabIndex="-1" aria-labelledby="bankingModalLabel" aria-hidden="true" style={{ display: 'block' }}>
+                  <div className="modal-dialog modal-dialog-centered">
+                    <div className="modal-content">
+                      <div className="modal-header bg-success text-white">
+                        <h5 className="modal-title" id="bankingModalLabel">Transfer Money</h5>
+                        <button type="button" className="btn-close btn-close-white" onClick={() => setShowBankingModal(false)} aria-label="Close"></button>
+                      </div>
+                      <div className="modal-body p-2 p-md-3">
+                        {transferError && <div className="alert alert-danger py-1 px-2" style={{ fontSize: '0.8rem' }}>{transferError}</div>}
+                        <form onSubmit={handleTransfer}>
+                          <div className="mb-2 mb-md-3">
+                            <label htmlFor="recipientSelect" className="form-label" style={{ fontSize: '0.9rem' }}>Transfer to:</label>
+                            <select
+                              id="recipientSelect"
+                              className="form-select form-select-sm"
+                              value={selectedRecipientId}
+                              onChange={(e) => setSelectedRecipientId(e.target.value)}
+                              required
+                              disabled // Disable dropdown as recipient is selected by click
+                            >
+                              <option value="">Select Recipient</option>
+                              <option value={BANK_UID}>Bank</option>
+                              {players.filter(([uid]) => uid !== user.uid).map(([uid, playerData]) => (
+                                <option key={uid} value={uid}>{playerData.name}</option>
+                              ))}
+                            </select>
+                          </div>
+                          <div className="mb-2 mb-md-3">
+                            <label htmlFor="transferAmountInput" className="form-label" style={{ fontSize: '0.9rem' }}>Amount:</label>
+                            <input
+                              type="number"
+                              id="transferAmountInput"
+                              className="form-control form-control-sm"
+                              value={transferAmount}
+                              onChange={(e) => setTransferAmount(e.target.value)}
+                              min="1"
+                              required
+                            />
+                          </div>
+                          <button type="submit" className="btn btn-primary btn-sm">Transfer Money</button>
+                        </form>
+                      </div>
+                      <div className="modal-footer">
+                        <button type="button" className="btn btn-secondary btn-sm" onClick={() => setShowBankingModal(false)}>Cancel</button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div className="modal-backdrop fade show"></div>
+              </>
+            )}
+
+            <div className="card mb-3 mb-md-4">
+              <div className="card-header bg-info text-white">Transaction Log</div>
+              <div className="card-body p-2 p-md-3" style={{ maxHeight: '200px', overflowY: 'auto' }}>
+                <ul className="list-group list-group-flush">
+                  {roomData.log && Object.values(roomData.log).reverse().map((logEntry) => {
+                    const sender = roomData.players[logEntry.from];
+                    const recipient = logEntry.to === BANK_UID ? bank : roomData.players[logEntry.to];
+
+                    return (
+                      <li key={logEntry.timestamp} className="list-group-item d-flex align-items-center justify-content-between py-1 px-0" style={{ fontSize: '0.8rem' }}>
+                        <div className="d-flex align-items-center">
+                          {/* Sender Info */}
+                          <div className="d-flex flex-column align-items-center mx-1">
+                            {sender?.avatarURL && <img src={sender.avatarURL} alt="Avatar" className="rounded-circle" style={{ width: '20px', height: '20px', objectFit: 'cover' }} />}
+                            <small>{sender?.name}</small>
+                          </div>
+
+                          {/* Arrow and Amount */}
+                          <span className="mx-1 d-flex align-items-center">
+                            <i className="bi bi-arrow-right me-1"></i>
+                            <strong> ${logEntry.amount} </strong>
+                          </span>
+
+                          {/* Recipient Info */}
+                          <div className="d-flex flex-column align-items-center mx-1">
+                            {logEntry.to === BANK_UID ? (
+                              bank.avatarURL && <img src={bank.avatarURL} alt="Bank" className="rounded-circle" style={{ width: '20px', height: '20px', objectFit: 'cover' }} />
+                            ) : (
+                              recipient?.avatarURL && <img src={recipient.avatarURL} alt="Avatar" className="rounded-circle" style={{ width: '20px', height: '20px', objectFit: 'cover' }} />
+                            )}
+                            <small>{recipient?.name}</small>
+                          </div>
+                        </div>
+                        <small className="text-muted">({new Date(logEntry.timestamp).toLocaleTimeString()})</small>
+                      </li>
+                    );
+                  })}
+                </ul>
+              </div>
             </div>
           </div>
         </div>
       </div>
-    </div>
+
+      <MoneyTransferAnimation isAnimating={isAnimating} animationDetails={animationDetails} />
+    </>
   );
 };
 
