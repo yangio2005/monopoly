@@ -36,7 +36,8 @@ const GameRoomPage = () => {
   const bankRef = useRef(null);
   const previousBalanceRef = useRef(0); // To track previous balance for sound effect
   const isInitialMount = useRef(true); // New ref to track initial mount
-  const [receivedEffectPlayerId, setReceivedEffectPlayerId] = useState(null); // State to trigger visual effect
+  const [playersWithEffect, setPlayersWithEffect] = useState([]); // State to trigger visual effect for multiple players
+  const [playersToAnimate, setPlayersToAnimate] = useState([]); // New state to trigger animation for multiple players
   const [newInitialBalance, setNewInitialBalance] = useState(''); // State for new initial balance input
 
   const handleUpdateInitialBalance = async () => {
@@ -108,10 +109,10 @@ const GameRoomPage = () => {
         if (currentBalance > previousBalance) {
           console.log("Balance increased! Playing money received sound.");
           moneyReceivedSound.play();
-          setReceivedEffectPlayerId(user.uid); // Trigger visual effect for current user
+          setPlayersWithEffect(prev => [...prev, user.uid]); // Add user.uid to playersWithEffect
           setTimeout(() => {
-            setReceivedEffectPlayerId(null); // Clear effect after 1 second
-          }, 1000);
+            setPlayersWithEffect(prev => prev.filter(id => id !== user.uid)); // Remove user.uid after 2.5 seconds
+          }, 2500);
         }
         previousBalanceRef.current = currentBalance;
         console.log("Updated previousBalanceRef.current:", previousBalanceRef.current);
@@ -124,6 +125,20 @@ const GameRoomPage = () => {
     // Also check if the sound itself is loaded
     console.log("moneyReceivedSound loaded:", moneyReceivedSound.state() === 'loaded');
   }, [roomData, user, moneyReceivedSound]);
+
+  // Effect to play sound and trigger visual effect for players in playersToAnimate
+  useEffect(() => {
+    if (playersToAnimate.length > 0) {
+      playersToAnimate.forEach(playerId => {
+        moneyReceivedSound.play();
+        setPlayersWithEffect(prev => [...prev, playerId]); // Add playerId to playersWithEffect
+        setTimeout(() => {
+          setPlayersWithEffect(prev => prev.filter(id => id !== playerId)); // Remove playerId after 2.5 seconds
+        }, 2500);
+      });
+      setPlayersToAnimate([]); // Clear the array after processing
+    }
+  }, [playersToAnimate, moneyReceivedSound]);
 
     useEffect(() => {
     if (user && roomId) {
@@ -209,8 +224,7 @@ const GameRoomPage = () => {
   const players = roomData.players ? Object.entries(roomData.players).filter(([uid]) => uid !== BANK_UID) : [];
   const bank = { name: "Bank", balance: roomData.bank || 0, avatarURL: bankAvatarURL };
 
-  const handleTransfer = async (e) => {
-    e.preventDefault();
+  const handleTransfer = async () => {
     setTransferError('');
 
     console.log("Initiating transfer...");
@@ -284,6 +298,7 @@ const GameRoomPage = () => {
       console.log("Updates object before set:", updates);
       await update(ref(database), updates);
       transferSound.play(); // Play sound on successful transfer
+      setPlayersToAnimate([user.uid, selectedRecipientId]); // Trigger effect for sender and recipient
       setTransferAmount('');
       // Do not clear selectedRecipientId immediately, it's needed for animation
       setShowBankingModal(false); // Close modal after successful transfer
@@ -417,11 +432,11 @@ const GameRoomPage = () => {
                     <button
                       ref={el => playerRefs.current[uid] = el}
                       key={uid}
-                      className={`text-center p-1 border rounded btn btn-light position-absolute ${uid === user.uid ? 'border-success' : ''} ${selectedRecipientId === uid ? 'border-warning shadow' : ''} ${uid === receivedEffectPlayerId ? 'money-received-effect' : ''}`}
+                      className={`text-center p-1 border rounded btn btn-light position-absolute ${uid === user.uid ? 'border-success' : ''} ${selectedRecipientId === uid ? 'border-warning shadow' : ''} ${playersWithEffect.includes(uid) ? 'money-received-effect' : ''}` }
                       style={{ width: '120px', ...position }}
                       onClick={() => { setSelectedRecipientId(uid); setShowBankingModal(true); clickSound.play(); }}
                     >
-                      {console.log(`Player ${uid}: receivedEffectPlayerId=${receivedEffectPlayerId}, classApplied=${uid === receivedEffectPlayerId ? 'money-received-effect' : ''}, fullClass=${`text-center p-1 border rounded btn btn-light position-absolute ${uid === user.uid ? 'border-success' : ''} ${selectedRecipientId === uid ? 'border-warning shadow' : ''} ${uid === receivedEffectPlayerId ? 'money-received-effect' : ''}`}`)}
+
                       {playerData.avatarURL && (
                         <img
                           src={playerData.avatarURL}
@@ -454,7 +469,6 @@ const GameRoomPage = () => {
                       </div>
                       <div className="modal-body p-2 p-md-3">
                         {transferError && <div className="alert alert-danger py-1 px-2" style={{ fontSize: '0.8rem' }}>{transferError}</div>}
-                        <form onSubmit={handleTransfer}>
                           <div className="mb-2 mb-md-3">
                             <label htmlFor="recipientSelect" className="form-label" style={{ fontSize: '0.9rem' }}>Transfer to:</label>
                             <select
@@ -477,10 +491,9 @@ const GameRoomPage = () => {
                             <CalculatorInput
                               value={transferAmount}
                               onChange={setTransferAmount}
+                              onEqualsClick={handleTransfer}
                             />
                           </div>
-                          <button type="submit" className="btn btn-primary btn-sm" onClick={() => clickSound.play()}>Transfer Money</button>
-                        </form>
                       </div>
                       <div className="modal-footer">
                         <button type="button" className="btn btn-secondary btn-sm" onClick={() => { setShowBankingModal(false); clickSound.play(); }}>Cancel</button>
