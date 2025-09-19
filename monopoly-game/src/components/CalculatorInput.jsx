@@ -7,16 +7,15 @@ const CalculatorInput = ({ value, onChange }) => {
   const [cursorPosition, setCursorPosition] = useState(0);
 
   useEffect(() => {
-    if (value !== parseFloat(expression) && value !== '') {
+    if (value !== expression && isResultDisplayed) {
       setExpression(String(value));
-      setIsResultDisplayed(true);
       setCursorPosition(String(value).length);
     } else if (value === '') {
       setExpression('');
       setIsResultDisplayed(false);
       setCursorPosition(0);
     }
-  }, [value]);
+  }, [value, isResultDisplayed]);
 
   useEffect(() => {
     if (inputRef.current) {
@@ -29,11 +28,7 @@ const CalculatorInput = ({ value, onChange }) => {
     setExpression(newValue);
     setCursorPosition(e.target.selectionStart);
     setIsResultDisplayed(false);
-    if (!isNaN(parseFloat(newValue)) && isFinite(parseFloat(newValue)) && !/[+\-*\/]/.test(newValue)) {
-      onChange(parseFloat(newValue));
-    } else {
-      onChange('');
-    }
+
   };
 
   const handleInputSelect = (e) => {
@@ -58,11 +53,7 @@ const CalculatorInput = ({ value, onChange }) => {
     }
     setExpression(newExpression);
     setCursorPosition(newCursorPosition);
-    if (!isNaN(parseFloat(newExpression)) && isFinite(parseFloat(newExpression)) && !/[+\-*\/]/.test(newExpression)) {
-      onChange(parseFloat(newExpression));
-    } else {
-      onChange('');
-    }
+
   };
 
   const handleOperatorClick = (op) => {
@@ -94,8 +85,7 @@ const CalculatorInput = ({ value, onChange }) => {
       }
     }
     setExpression(newExpression);
-    setCursorPosition(newCursorPosition);
-  };
+          setCursorPosition(newCursorPosition);  };
 
   const handleEqualsClick = () => {
     if (expression) {
@@ -142,13 +132,7 @@ const CalculatorInput = ({ value, onChange }) => {
     }
     setExpression(newExpression);
     setCursorPosition(newCursorPosition);
-    if (!isNaN(parseFloat(newExpression)) && isFinite(parseFloat(newExpression)) && !/[+\-*\/]/.test(newExpression)) {
-      onChange(parseFloat(newExpression));
-    } else if (newExpression === '') {
-      onChange('');
-    } else {
-      onChange('');
-    }
+
   };
 
   return (

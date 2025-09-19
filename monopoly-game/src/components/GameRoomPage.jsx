@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Howl } from 'howler';
 import { useParams, useNavigate } from 'react-router-dom';
-import { auth, database, ref, onValue, set, push, update, onDisconnect } from '../firebase';
+import { auth, database, ref, onValue, set, push, update } from '../firebase';
 import { onAuthStateChanged } from 'firebase/auth';
 import QRCode from 'react-qr-code';
 import MoneyTransferAnimation from './MoneyTransferAnimation';
@@ -37,6 +37,28 @@ const GameRoomPage = () => {
   const previousBalanceRef = useRef(0); // To track previous balance for sound effect
   const isInitialMount = useRef(true); // New ref to track initial mount
   const [receivedEffectPlayerId, setReceivedEffectPlayerId] = useState(null); // State to trigger visual effect
+  const [newInitialBalance, setNewInitialBalance] = useState(''); // State for new initial balance input
+
+  const handleUpdateInitialBalance = async () => {
+    if (user.uid !== BANK_UID) {
+      alert("Only the bank can update the initial player balance.");
+      return;
+    }
+    const amount = parseInt(newInitialBalance);
+    if (isNaN(amount) || amount <= 0) {
+      alert("Please enter a valid positive amount for the initial balance.");
+      return;
+    }
+
+    try {
+      await update(ref(database, `rooms/${roomId}`), { initialPlayerBalance: amount });
+      alert("Initial player balance updated successfully!");
+      setNewInitialBalance('');
+    } catch (e) {
+      console.error("Error updating initial player balance:", e);
+      alert("Failed to update initial player balance.");
+    }
+  };
 
   useEffect(() => {
     const unsubscribeAuth = onAuthStateChanged(auth, (currentUser) => {
@@ -124,9 +146,10 @@ const GameRoomPage = () => {
 
           if (data && (!data.players || !data.players[user.uid])) {
             // Player does not exist, add them
+            const initialPlayerBalance = data.initialPlayerBalance || 1500; // Get initial balance from room data or default to 1500
             await set(ref(database, `rooms/${roomId}/players/${user.uid}`), {
               name: playerName,
-              balance: 1500,
+              balance: initialPlayerBalance,
               position: 0,
               properties: {},
               avatarURL: playerAvatarURL
@@ -166,11 +189,7 @@ const GameRoomPage = () => {
       });
       return () => {
         unsubscribeRoom();
-        // Explicitly remove player from room when component unmounts
-        if (user && roomId) {
-          const playerInRoomRef = ref(database, `rooms/${roomId}/players/${user.uid}`);
-          set(playerInRoomRef, null);
-        }
+        // Removed explicit player removal on unmount to preserve data
       };
     }
   }, [user, roomId, navigate]);
@@ -214,7 +233,8 @@ const GameRoomPage = () => {
 
     const senderPlayer = roomData.players[user.uid];
     console.log("Sender player:", senderPlayer);
-    if (senderPlayer.balance < amount) {
+    // Only check balance if the sender is not the bank
+    if (user.uid !== BANK_UID && senderPlayer.balance < amount) {
       setTransferError("Insufficient balance.");
       console.log("Validation failed: Insufficient balance.");
       return;
@@ -361,6 +381,28 @@ const GameRoomPage = () => {
                     <strong>Total Game Money (Bank):</strong> ${bank.balance}
                   </button>
                 </div>
+                {user && user.uid === BANK_UID && (
+                  <div className="position-absolute top-0 start-0 p-2">
+                    <div className="input-group input-group-sm">
+                      <span className="input-group-text">Initial Balance:</span>
+                      <input
+                        type="number"
+                        className="form-control"
+                        value={newInitialBalance}
+                        onChange={(e) => setNewInitialBalance(e.target.value)}
+                        placeholder="e.g., 1500"
+                      />
+                      <button className="btn btn-outline-secondary" type="button" onClick={handleUpdateInitialBalance}>
+                        Set
+                      </button>
+                    </div>
+                    {roomData.initialPlayerBalance && (
+                      <small className="text-muted mt-1 d-block">
+                        Current: ${roomData.initialPlayerBalance}
+                      </small>
+                    )}
+                  </div>
+                )}
                 {/* Player positions will be added here */}
                 {players.map(([uid, playerData], index) => {
                   const playerPositions = [
