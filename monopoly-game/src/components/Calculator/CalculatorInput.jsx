@@ -1,18 +1,22 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { evaluate } from 'mathjs';
 import './CalculatorInput.css';
 
-const CalculatorInput = ({ value, onChange, onEqualsClick }) => {
+const CalculatorInput = ({ value, onValueChange, onCalculatedValue }) => {
   const [expression, setExpression] = useState(value ? String(value) : '');
+  const [calculatedResult, setCalculatedResult] = useState(null);
   const [isResultDisplayed, setIsResultDisplayed] = useState(false);
   const inputRef = useRef(null);
   const [cursorPosition, setCursorPosition] = useState(0);
 
   useEffect(() => {
-    if (isResultDisplayed && String(value) !== expression) {
+    // Update internal expression if external value changes
+    if (String(value) !== expression) {
       setExpression(String(value));
-      setCursorPosition(String(value).length);
+      setCalculatedResult(null); // Clear calculated result if external value changes
+      setIsResultDisplayed(false);
     }
-  }, [value, isResultDisplayed, expression]);
+  }, [value]);
 
   useEffect(() => {
     if (inputRef.current) {
@@ -25,11 +29,8 @@ const CalculatorInput = ({ value, onChange, onEqualsClick }) => {
     setExpression(newValue);
     setCursorPosition(e.target.selectionStart);
     setIsResultDisplayed(false);
-
-    if (!isNaN(parseFloat(newValue)) && isFinite(parseFloat(newValue)) && !/[+\-*\/]/g.test(newValue)) {
-      onChange(parseFloat(newValue));
-    } else if (newValue === '') {
-      onChange('');
+    if (onValueChange) {
+      onValueChange(newValue);
     }
   };
 
@@ -49,17 +50,26 @@ const CalculatorInput = ({ value, onChange, onEqualsClick }) => {
       newExpression = String(num);
       newCursorPosition = newExpression.length;
       setIsResultDisplayed(false);
+      setCalculatedResult(null);
     } else {
       newExpression = insertAtCursor(expression, String(num), cursorPosition);
       newCursorPosition = cursorPosition + String(num).length;
     }
     setExpression(newExpression);
     setCursorPosition(newCursorPosition);
+    if (onValueChange) {
+      onValueChange(newExpression);
+    }
   }; // Added closing brace here
 
   const handleOperatorClick = (op) => {
     let newExpression = expression;
     let newCursorPosition = cursorPosition;
+
+    // Prevent adding operator if expression is empty, unless it's a minus sign for negative numbers
+    if (!expression && op !== '-') {
+      return;
+    }
 
     if (isResultDisplayed) {
       newExpression = expression + op;
@@ -88,38 +98,88 @@ const CalculatorInput = ({ value, onChange, onEqualsClick }) => {
     setExpression(newExpression);
     setCursorPosition(newCursorPosition);
   };
+
+  const handleDecimalClick = () => {
+    let newExpression = expression;
+    let newCursorPosition = cursorPosition;
+
+    if (isResultDisplayed) {
+      newExpression = '0.';
+      newCursorPosition = 2;
+      setIsResultDisplayed(false);
+    } else {
+      // Prevent multiple decimals in a single number segment
+      const parts = newExpression.substring(0, cursorPosition).split(/[+\-*\/]/);
+      const currentNumber = parts[parts.length - 1];
+      if (!currentNumber.includes('.')) {
+        newExpression = insertAtCursor(newExpression, '.', cursorPosition);
+        newCursorPosition = cursorPosition + 1;
+      }
+    }
+    setExpression(newExpression);
+    setCursorPosition(newCursorPosition);
+  };
   const handleEqualsClick = () => {
     if (expression) {
       try {
         const lastChar = expression.slice(-1);
         if (['+', '-', '*', '/'].includes(lastChar)) {
           setExpression('Error');
-          onChange('');
+          if (onValueChange) {
+            onValueChange('Error');
+          }
+          if (onCalculatedValue) {
+            onCalculatedValue(null);
+          }
           setIsResultDisplayed(true);
+          setCalculatedResult(null);
           return;
         }
-        const result = eval(expression);
+
+        let result;
+        // Check if the expression is a simple integer (Flow 1 - part 1)
+        if (/^\d+$/.test(expression)) {
+          result = parseInt(expression, 10);
+        } else {
+          // Evaluate the expression (Flow 1 - part 2)
+          result = evaluate(expression);
+        }
+
+        // Ensure the result is an integer (Flow 1 - part 3)
+        if (typeof result === 'number' && !Number.isInteger(result)) {
+          result = Math.floor(result); // Or Math.round(result) depending on game rules
+        }
+
         setExpression(String(result));
-        onChange(result);
+        setCalculatedResult(result);
         setIsResultDisplayed(true);
         setCursorPosition(String(result).length);
-        if (onEqualsClick) {
-          onEqualsClick(result);
+        if (onCalculatedValue) {
+          onCalculatedValue(result);
         }
       } catch (e) {
         setExpression('Error');
-        onChange('');
         setIsResultDisplayed(true);
         setCursorPosition('Error'.length);
+        if (onCalculatedValue) {
+          onCalculatedValue(null);
+        }
+        setCalculatedResult(null);
       }
     }
   };
 
   const handleClearClick = () => {
     setExpression('');
-    onChange('');
+    setCalculatedResult(null);
     setIsResultDisplayed(false);
     setCursorPosition(0);
+    if (onValueChange) {
+      onValueChange('');
+    }
+    if (onCalculatedValue) {
+      onCalculatedValue(null);
+    }
   };
 
   const handleBackspaceClick = () => {
@@ -127,15 +187,27 @@ const CalculatorInput = ({ value, onChange, onEqualsClick }) => {
     let newCursorPosition = cursorPosition;
 
     if (isResultDisplayed) {
-      newExpression = '';
       setIsResultDisplayed(false);
+      newExpression = '';
       newCursorPosition = 0;
+      setCalculatedResult(null);
     } else if (cursorPosition > 0 && expression.length > 0) {
       newExpression = expression.slice(0, cursorPosition - 1) + expression.slice(cursorPosition);
       newCursorPosition = cursorPosition - 1;
+    } else {
+      newExpression = expression;
+      newCursorPosition = cursorPosition;
     }
     setExpression(newExpression);
     setCursorPosition(newCursorPosition);
+    if (onValueChange) {
+      onValueChange(newExpression);
+    }
+    if (newExpression === '') {
+      if (onCalculatedValue) {
+        onCalculatedValue(null);
+      }
+    }
   };
 
   return (
@@ -150,6 +222,11 @@ const CalculatorInput = ({ value, onChange, onEqualsClick }) => {
           ref={inputRef}
           style={{ fontSize: '1.2rem', height: '45px' }}
         />
+        {calculatedResult !== null && (
+          <div className="text-end text-muted mb-2" style={{ fontSize: '0.8rem' }}>
+            Bill: {calculatedResult}
+          </div>
+        )}
         <div className="d-grid gap-1 calculator-grid">
           <button type="button" className="btn btn-secondary" onClick={() => handleNumberClick(7)}>7</button>
           <button type="button" className="btn btn-secondary" onClick={() => handleNumberClick(8)}>8</button>
@@ -168,7 +245,9 @@ const CalculatorInput = ({ value, onChange, onEqualsClick }) => {
 
           <button type="button" className="btn btn-danger" onClick={handleClearClick}>C</button>
           <button type="button" className="btn btn-secondary" onClick={handleBackspaceClick}>DEL</button>
-          <button type="button" className="btn btn-secondary span-2" onClick={() => handleNumberClick(0)}>0</button>
+          <button type="button" className="btn btn-secondary span-2" onClick={() => handleNumberClick('0')}>0</button>
+          <button type="button" className="btn btn-secondary" onClick={() => handleNumberClick('000')}>000</button>
+          <button type="button" className="btn btn-secondary" onClick={handleDecimalClick}>.</button>
 
           <button type="button" className="btn btn-success" onClick={handleEqualsClick}>=</button>
           <button type="button" className="btn btn-info" onClick={() => handleOperatorClick('+')}>+</button>
