@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { auth, database, ref, set, onValue } from '../firebase';
 import { onAuthStateChanged } from 'firebase/auth';
+import CharacterSelector from './CharacterSelector';
 
 const ProfilePage = () => {
   const [user, setUser] = useState(null);
   const [name, setName] = useState('');
   const [avatarURL, setAvatarURL] = useState('');
+  const [characterId, setCharacterId] = useState('male-1'); // Default character
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
@@ -19,6 +21,7 @@ const ProfilePage = () => {
           if (data) {
             setName(data.name || '');
             setAvatarURL(data.avatarURL || '');
+            setCharacterId(data.characterId || 'male-1'); // Load character selection
           }
           setLoading(false);
         }, (dbError) => {
@@ -44,6 +47,7 @@ const ProfilePage = () => {
         await set(ref(database, 'users/' + user.uid), {
           name: name,
           avatarURL: avatarURL,
+          characterId: characterId, // Save character selection
         });
         alert('Profile updated successfully!');
       } catch (saveError) {
@@ -101,6 +105,15 @@ const ProfilePage = () => {
                     onChange={(e) => setAvatarURL(e.target.value)}
                   />
                 </div>
+
+                {/* Character Selector */}
+                <div className="mb-4">
+                  <CharacterSelector
+                    selectedCharacterId={characterId}
+                    onSelect={setCharacterId}
+                  />
+                </div>
+
                 <button type="submit" className="btn btn-primary">Save Profile</button>
               </form>
             </div>

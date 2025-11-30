@@ -1,15 +1,1 @@
-.calculator .btn {
-  font-size: 1.5rem; /* Increase font size */
-  padding: 15px; /* Increase padding for larger buttons */
-  height: auto; /* Allow height to adjust based on padding */
-}
-
-.calculator-grid {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 10px; /* Increase gap between buttons */
-}
-
-.calculator-grid .span-2 {
-  grid-column: span 2;
-}
+/* CSS replaced with Tailwind in CalculatorInput.jsx */

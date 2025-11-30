@@ -14,16 +14,9 @@ const PlayerList = () => {
     playerRefs,
     bankRef,
     playersWithEffect,
-    newInitialBalance,
-    setNewInitialBalance,
-    handleUpdateInitialBalance,
-    newCurrencySymbol,
-    setNewCurrencySymbol,
-    handleUpdateCurrencySymbol,
     BANK_UID,
     currencySymbol,
     currencyCode,
-    setShowBankSettingsModal,
   } = useGameRoom();
 
   if (!roomData) return null;
@@ -32,48 +25,126 @@ const PlayerList = () => {
   const bank = { name: "Bank", balance: roomData.bank || 0, avatarURL: bankAvatarURL };
 
   return (
-    <div className="card h-100">
-      <div className="card-header bg-primary text-white">Game Status</div>
-      <div className="card-body p-2 p-md-3 position-relative" style={{ minHeight: '300px' }}>
-        <div className="position-absolute top-50 start-50 translate-middle text-center">
+    <div className="relative p-1 rounded-2xl bg-gradient-to-b from-cyan-500/20 to-purple-500/20 backdrop-blur-xl border border-white/10 shadow-[0_0_30px_rgba(0,0,0,0.5)] h-full min-h-[400px]">
+      <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-cyan-500/50 to-transparent opacity-50"></div>
+
+      {/* Header */}
+      <div className="p-4 border-b border-white/5 flex items-center justify-between bg-black/20 rounded-t-xl">
+        <h3 className="text-lg font-bold text-cyan-400 tracking-wider flex items-center gap-2">
+          <span className="w-2 h-2 bg-cyan-500 rounded-full animate-pulse"></span>
+          GAME STATUS
+        </h3>
+        <div className="text-xs font-mono text-purple-400/80">
+          PLAYERS: {players.length}
+        </div>
+      </div>
+
+      <div className="p-4 relative h-[calc(100%-60px)]">
+        {/* Bank Button (Center) */}
+        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-10 w-full max-w-[200px]">
           <button
             ref={bankRef}
-            className={`btn btn-light text-start p-0 mb-1 mb-md-2 ${selectedRecipientId === BANK_UID ? 'border-warning shadow' : ''}`}
             onClick={() => { setSelectedRecipientId(BANK_UID); setShowBankingModal(true); clickSound.play(); }}
+            className={`
+              w-full group relative p-4 rounded-xl border transition-all duration-300
+              ${selectedRecipientId === BANK_UID
+                ? 'bg-yellow-500/20 border-yellow-500 shadow-[0_0_20px_rgba(234,179,8,0.3)]'
+                : 'bg-black/40 border-yellow-500/30 hover:border-yellow-500/60 hover:bg-yellow-500/10'
+              }
+            `}
           >
-            <strong>Total Game Money (Bank):</strong> {formatCurrency(bank.balance, currencySymbol, currencyCode)}
+            <div className="flex flex-col items-center gap-2">
+              <div className={`
+                w-12 h-12 rounded-full flex items-center justify-center border-2 transition-all duration-300
+                ${selectedRecipientId === BANK_UID ? 'border-yellow-400 bg-yellow-500/20' : 'border-yellow-500/30 bg-black/50 group-hover:border-yellow-500/60'}
+              `}>
+                <span className="text-2xl">🏦</span>
+              </div>
+              <div className="text-center">
+                <div className="text-xs font-mono text-yellow-500/80 mb-1">CENTRAL BANK</div>
+                <div className="text-lg font-bold text-yellow-400 font-mono tracking-tight">
+                  {formatCurrency(bank.balance, currencySymbol, currencyCode)}
+                </div>
+              </div>
+            </div>
+
+            {/* Corner Accents */}
+            <div className="absolute top-0 left-0 w-2 h-2 border-t border-l border-yellow-500 opacity-50"></div>
+            <div className="absolute top-0 right-0 w-2 h-2 border-t border-r border-yellow-500 opacity-50"></div>
+            <div className="absolute bottom-0 left-0 w-2 h-2 border-b border-l border-yellow-500 opacity-50"></div>
+            <div className="absolute bottom-0 right-0 w-2 h-2 border-b border-r border-yellow-500 opacity-50"></div>
           </button>
         </div>
-        {players.map(([uid, playerData], index) => {
-          const playerPositions = [
-            { top: '10px', left: '10px' },
-            { top: '10px', right: '10px' },
-            { bottom: '10px', left: '10px' },
-            { bottom: '10px', right: '10px' }
-          ];
-          const position = playerPositions[index % playerPositions.length];
 
-          return (
-            <button
-              ref={el => playerRefs.current[uid] = el}
-              key={uid}
-              className={`text-center p-1 border rounded btn btn-light position-absolute ${uid === user.uid ? 'border-success' : ''} ${selectedRecipientId === uid ? 'border-warning shadow' : ''} ${playersWithEffect.includes(uid) ? 'money-received-effect' : ''}` }
-              style={{ width: '120px', ...position }}
-              onClick={() => { setSelectedRecipientId(uid); setShowBankingModal(true); clickSound.play(); }}
-            >
-              {playerData.avatarURL && (
-                <img
-                  src={playerData.avatarURL}
-                  alt="Avatar"
-                  className="rounded-circle mb-1"
-                  style={{ width: '45px', height: '45px', objectFit: 'cover' }}
-                />
-              )}
-              <h6 className="mb-0" style={{ fontSize: '1.05rem' }}>{playerData.name}</h6>
-              <p className="text-muted mb-0" style={{ fontSize: '0.9rem' }}>{formatCurrency(playerData.balance, currencySymbol, currencyCode)}</p>
-            </button>
-          );
-        })}
+        {/* Players Grid */}
+        <div className="grid grid-cols-2 gap-4 h-full">
+          {players.map(([uid, playerData], index) => {
+            const isCurrentUser = uid === user.uid;
+            const isSelected = selectedRecipientId === uid;
+            const hasEffect = playersWithEffect.includes(uid);
+
+            // Calculate position classes based on index
+            // 0: Top Left, 1: Top Right, 2: Bottom Left, 3: Bottom Right
+            // For more than 4 players, we might need a different layout, but for now let's stick to corners/sides
+            let positionClass = '';
+            if (players.length <= 4) {
+              if (index === 0) positionClass = 'self-start justify-self-start';
+              if (index === 1) positionClass = 'self-start justify-self-end';
+              if (index === 2) positionClass = 'self-end justify-self-start';
+              if (index === 3) positionClass = 'self-end justify-self-end';
+            } else {
+              // Fallback for many players - just grid flow
+              positionClass = '';
+            }
+
+            return (
+              <button
+                key={uid}
+                ref={el => playerRefs.current[uid] = el}
+                onClick={() => { setSelectedRecipientId(uid); setShowBankingModal(true); clickSound.play(); }}
+                className={`
+                  ${positionClass}
+                  relative p-3 rounded-xl border transition-all duration-300 w-full max-w-[160px]
+                  ${isSelected
+                    ? 'bg-cyan-500/20 border-cyan-500 shadow-[0_0_20px_rgba(34,211,238,0.3)] scale-105'
+                    : isCurrentUser
+                      ? 'bg-green-500/10 border-green-500/50 hover:bg-green-500/20 hover:border-green-500'
+                      : 'bg-black/40 border-white/10 hover:border-purple-500/50 hover:bg-purple-500/10'
+                  }
+                  ${hasEffect ? 'animate-pulse ring-2 ring-green-400 shadow-[0_0_30px_rgba(74,222,128,0.5)]' : ''}
+                `}
+              >
+                <div className="flex flex-col items-center gap-2">
+                  <div className="relative">
+                    {playerData.avatarURL ? (
+                      <img
+                        src={playerData.avatarURL}
+                        alt="Avatar"
+                        className={`w-10 h-10 rounded-lg object-cover border-2 ${isSelected ? 'border-cyan-400' : 'border-white/20'}`}
+                      />
+                    ) : (
+                      <div className={`w-10 h-10 rounded-lg flex items-center justify-center border-2 ${isSelected ? 'border-cyan-400 bg-cyan-500/20' : 'border-white/20 bg-white/5'}`}>
+                        <span className="text-lg">👤</span>
+                      </div>
+                    )}
+                    {isCurrentUser && (
+                      <div className="absolute -top-1 -right-1 w-3 h-3 bg-green-500 rounded-full border-2 border-black"></div>
+                    )}
+                  </div>
+
+                  <div className="text-center w-full overflow-hidden">
+                    <h6 className={`text-sm font-bold truncate mb-0.5 ${isSelected ? 'text-cyan-300' : 'text-gray-200'}`}>
+                      {playerData.name}
+                    </h6>
+                    <p className={`text-xs font-mono font-bold ${isSelected ? 'text-cyan-400' : 'text-gray-400'}`}>
+                      {formatCurrency(playerData.balance, currencySymbol, currencyCode)}
+                    </p>
+                  </div>
+                </div>
+              </button>
+            );
+          })}
+        </div>
       </div>
     </div>
   );

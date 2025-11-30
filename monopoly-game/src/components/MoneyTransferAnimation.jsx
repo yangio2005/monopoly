@@ -21,11 +21,10 @@ const MoneyTransferAnimation = ({ isAnimating, animationDetails }) => {
         transform: transformValue,
         zIndex: 1000,
         pointerEvents: 'none',
-        opacity: 1,
       }}
-      className="money-animation" // This class will now only define the transition
+      className="transition-all duration-[1500ms] ease-in-out"
     >
-      <span className="badge bg-warning text-dark" style={{ fontSize: '1.2rem' }}>
+      <span className="px-3 py-1 rounded-full bg-yellow-500 text-black font-bold font-mono text-lg shadow-[0_0_15px_rgba(234,179,8,0.5)] border border-yellow-300">
         -${animationDetails.amount}
       </span>
     </div>

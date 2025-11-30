@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { evaluate } from 'mathjs';
-import './CalculatorInput.css';
 
 const CalculatorInput = ({ value, onValueChange, onCalculatedValue }) => {
   const [expression, setExpression] = useState(value ? String(value) : '');
@@ -60,7 +59,7 @@ const CalculatorInput = ({ value, onValueChange, onCalculatedValue }) => {
     if (onValueChange) {
       onValueChange(newExpression);
     }
-  }; // Added closing brace here
+  };
 
   const handleOperatorClick = (op) => {
     let newExpression = expression;
@@ -210,47 +209,77 @@ const CalculatorInput = ({ value, onValueChange, onCalculatedValue }) => {
     }
   };
 
+  const Button = ({ onClick, children, className = '', variant = 'default' }) => {
+    const variants = {
+      default: 'bg-gray-800 text-cyan-400 border-gray-700 hover:bg-gray-700 hover:border-cyan-500 hover:shadow-[0_0_10px_rgba(34,211,238,0.3)]',
+      operator: 'bg-gray-900 text-purple-400 border-gray-800 hover:bg-gray-800 hover:border-purple-500 hover:shadow-[0_0_10px_rgba(192,132,252,0.3)]',
+      action: 'bg-red-900/30 text-red-400 border-red-900/50 hover:bg-red-900/50 hover:border-red-500 hover:shadow-[0_0_10px_rgba(248,113,113,0.3)]',
+      success: 'bg-green-900/30 text-green-400 border-green-900/50 hover:bg-green-900/50 hover:border-green-500 hover:shadow-[0_0_10px_rgba(74,222,128,0.3)]',
+    };
+
+    return (
+      <button
+        type="button"
+        onClick={onClick}
+        className={`
+          relative overflow-hidden p-4 text-xl font-mono font-bold border rounded-lg transition-all duration-200 active:scale-95
+          ${variants[variant]}
+          ${className}
+        `}
+      >
+        <span className="relative z-10">{children}</span>
+        <div className="absolute inset-0 bg-gradient-to-br from-white/5 to-transparent opacity-0 hover:opacity-100 transition-opacity" />
+      </button>
+    );
+  };
+
   return (
-    <div className="calculator card p-2 bg-dark text-white border-secondary">
-      <div className="card-body p-0">
-        <input
-          type="text"
-          className="form-control text-end mb-2 bg-dark text-white border-secondary"
-          value={expression}
-          onChange={handleInputChange}
-          onSelect={handleInputSelect}
-          ref={inputRef}
-          style={{ fontSize: '1.2rem', height: '45px' }}
-        />
-        {calculatedResult !== null && (
-          <div className="text-end text-muted mb-2" style={{ fontSize: '0.8rem' }}>
-            Bill: {calculatedResult}
-          </div>
-        )}
-        <div className="d-grid gap-1 calculator-grid">
-          <button type="button" className="btn btn-secondary" onClick={() => handleNumberClick(7)}>7</button>
-          <button type="button" className="btn btn-secondary" onClick={() => handleNumberClick(8)}>8</button>
-          <button type="button" className="btn btn-secondary" onClick={() => handleNumberClick(9)}>9</button>
-          <button type="button" className="btn btn-info" onClick={() => handleOperatorClick('/')}>/</button>
+    <div className="w-full max-w-md mx-auto p-1 bg-gradient-to-b from-cyan-500/20 to-purple-500/20 rounded-2xl backdrop-blur-xl border border-white/10 shadow-[0_0_30px_rgba(0,0,0,0.5)]">
+      <div className="bg-gray-900/90 p-4 rounded-xl border border-white/5">
+        {/* Display Screen */}
+        <div className="relative mb-4 p-4 bg-black rounded-lg border border-cyan-500/30 shadow-[inset_0_0_20px_rgba(34,211,238,0.1)]">
+          <input
+            type="text"
+            className="w-full bg-transparent text-right text-3xl font-mono text-cyan-400 placeholder-cyan-900 focus:outline-none"
+            value={expression}
+            onChange={handleInputChange}
+            onSelect={handleInputSelect}
+            ref={inputRef}
+            placeholder="0"
+          />
+          {calculatedResult !== null && (
+            <div className="text-right text-purple-400 font-mono text-sm mt-1 animate-pulse">
+              Bill: {calculatedResult}
+            </div>
+          )}
+          <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-cyan-500/50 to-transparent opacity-50" />
+        </div>
 
-          <button type="button" className="btn btn-secondary" onClick={() => handleNumberClick(4)}>4</button>
-          <button type="button" className="btn btn-secondary" onClick={() => handleNumberClick(5)}>5</button>
-          <button type="button" className="btn btn-secondary" onClick={() => handleNumberClick(6)}>6</button>
-          <button type="button" className="btn btn-info" onClick={() => handleOperatorClick('*')}>*</button>
+        {/* Keypad */}
+        <div className="grid grid-cols-4 gap-3">
+          <Button onClick={() => handleNumberClick(7)}>7</Button>
+          <Button onClick={() => handleNumberClick(8)}>8</Button>
+          <Button onClick={() => handleNumberClick(9)}>9</Button>
+          <Button onClick={() => handleOperatorClick('/')} variant="operator">/</Button>
 
-          <button type="button" className="btn btn-secondary" onClick={() => handleNumberClick(1)}>1</button>
-          <button type="button" className="btn btn-secondary" onClick={() => handleNumberClick(2)}>2</button>
-          <button type="button" className="btn btn-secondary" onClick={() => handleNumberClick(3)}>3</button>
-          <button type="button" className="btn btn-info" onClick={() => handleOperatorClick('-')}>-</button>
+          <Button onClick={() => handleNumberClick(4)}>4</Button>
+          <Button onClick={() => handleNumberClick(5)}>5</Button>
+          <Button onClick={() => handleNumberClick(6)}>6</Button>
+          <Button onClick={() => handleOperatorClick('*')} variant="operator">*</Button>
 
-          <button type="button" className="btn btn-danger" onClick={handleClearClick}>C</button>
-          <button type="button" className="btn btn-secondary" onClick={handleBackspaceClick}>DEL</button>
-          <button type="button" className="btn btn-secondary span-2" onClick={() => handleNumberClick('0')}>0</button>
-          <button type="button" className="btn btn-secondary" onClick={() => handleNumberClick('000')}>000</button>
-          <button type="button" className="btn btn-secondary" onClick={handleDecimalClick}>.</button>
+          <Button onClick={() => handleNumberClick(1)}>1</Button>
+          <Button onClick={() => handleNumberClick(2)}>2</Button>
+          <Button onClick={() => handleNumberClick(3)}>3</Button>
+          <Button onClick={() => handleOperatorClick('-')} variant="operator">-</Button>
 
-          <button type="button" className="btn btn-success" onClick={handleEqualsClick}>=</button>
-          <button type="button" className="btn btn-info" onClick={() => handleOperatorClick('+')}>+</button>
+          <Button onClick={handleClearClick} variant="action">C</Button>
+          <Button onClick={handleBackspaceClick} variant="action">DEL</Button>
+          <Button onClick={() => handleNumberClick('0')}>0</Button>
+          <Button onClick={() => handleOperatorClick('+')} variant="operator">+</Button>
+
+          <Button onClick={() => handleNumberClick('000')} className="col-span-2">000</Button>
+          <Button onClick={handleDecimalClick}>.</Button>
+          <Button onClick={handleEqualsClick} variant="success">=</Button>
         </div>
       </div>
     </div>
