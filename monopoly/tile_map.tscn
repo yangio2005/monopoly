@@ -1,0 +1,236 @@
+[gd_scene load_steps=27 format=3 uid="uid://jcr0aivjwvuw"]
+
+[ext_resource type="Texture2D" uid="uid://cpqnyhvdp2t3e" path="res://Cute_Fantasy_Free/Tiles/Beach_Tile.png" id="1_2cfip"]
+[ext_resource type="Texture2D" uid="uid://cm6j147qwoiu4" path="res://Cute_Fantasy_Free/Tiles/Cliff_Tile.png" id="2_sqirv"]
+[ext_resource type="Texture2D" uid="uid://50uohxpmqp6p" path="res://Cute_Fantasy_Free/Tiles/FarmLand_Tile.png" id="3_c81vo"]
+[ext_resource type="Texture2D" uid="uid://bba6o6fnvlfgh" path="res://Cute_Fantasy_Free/Tiles/Grass_Middle.png" id="4_i6cpi"]
+[ext_resource type="Texture2D" uid="uid://dw5ppv1ec3hh" path="res://Cute_Fantasy_Free/Tiles/Path_Middle.png" id="5_s20o0"]
+[ext_resource type="Texture2D" uid="uid://di4t1hq6kijls" path="res://Cute_Fantasy_Free/Tiles/Path_Tile.png" id="6_47trr"]
+[ext_resource type="Texture2D" uid="uid://muganm2w5jjx" path="res://Cute_Fantasy_Free/Tiles/Water_Middle.png" id="7_mvv3g"]
+[ext_resource type="Texture2D" uid="uid://bi1bvvbg0p70e" path="res://Cute_Fantasy_Free/Tiles/Water_Tile.png" id="8_k8jdh"]
+
+[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_gkke7"]
+texture = ExtResource("1_2cfip")
+0:0/0 = 0
+1:0/0 = 0
+2:0/0 = 0
+3:0/0 = 0
+4:0/0 = 0
+0:1/0 = 0
+1:1/0 = 0
+2:1/0 = 0
+3:1/0 = 0
+4:1/0 = 0
+0:2/0 = 0
+1:2/0 = 0
+2:2/0 = 0
+
+[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_4snpw"]
+texture = ExtResource("2_sqirv")
+0:0/0 = 0
+1:0/0 = 0
+2:0/0 = 0
+0:1/0 = 0
+1:1/0 = 0
+2:1/0 = 0
+0:2/0 = 0
+1:2/0 = 0
+2:2/0 = 0
+0:3/0 = 0
+1:3/0 = 0
+0:4/0 = 0
+1:4/0 = 0
+0:5/0 = 0
+1:5/0 = 0
+2:5/0 = 0
+
+[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_l1e5b"]
+texture = ExtResource("3_c81vo")
+0:0/0 = 0
+1:0/0 = 0
+2:0/0 = 0
+0:1/0 = 0
+1:1/0 = 0
+2:1/0 = 0
+0:2/0 = 0
+1:2/0 = 0
+2:2/0 = 0
+
+[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_cxhyb"]
+texture = ExtResource("4_i6cpi")
+0:0/0 = 0
+
+[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_jsnob"]
+texture = ExtResource("5_s20o0")
+0:0/0 = 0
+
+[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_8mkqx"]
+texture = ExtResource("6_47trr")
+0:0/0 = 0
+1:0/0 = 0
+2:0/0 = 0
+0:1/0 = 0
+1:1/0 = 0
+2:1/0 = 0
+0:2/0 = 0
+1:2/0 = 0
+2:2/0 = 0
+0:3/0 = 0
+1:3/0 = 0
+0:4/0 = 0
+1:4/0 = 0
+0:5/0 = 0
+1:5/0 = 0
+2:5/0 = 0
+
+[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_g2lfc"]
+texture = ExtResource("7_mvv3g")
+0:0/0 = 0
+
+[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_2sfib"]
+texture = ExtResource("8_k8jdh")
+0:0/next_alternative_id = 2
+0:0/0 = 0
+0:0/1 = 1
+1:0/0 = 0
+2:0/0 = 0
+0:1/0 = 0
+1:1/0 = 0
+2:1/0 = 0
+0:2/0 = 0
+1:2/0 = 0
+2:2/0 = 0
+0:3/0 = 0
+1:3/0 = 0
+0:4/0 = 0
+1:4/0 = 0
+0:5/0 = 0
+1:5/0 = 0
+2:5/0 = 0
+
+[sub_resource type="TileSet" id="TileSet_r3rok"]
+sources/16 = SubResource("TileSetAtlasSource_gkke7")
+sources/17 = SubResource("TileSetAtlasSource_4snpw")
+sources/18 = SubResource("TileSetAtlasSource_l1e5b")
+sources/19 = SubResource("TileSetAtlasSource_cxhyb")
+sources/20 = SubResource("TileSetAtlasSource_jsnob")
+sources/21 = SubResource("TileSetAtlasSource_8mkqx")
+sources/22 = SubResource("TileSetAtlasSource_g2lfc")
+sources/23 = SubResource("TileSetAtlasSource_2sfib")
+
+[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_5gc6g"]
+texture = ExtResource("1_2cfip")
+0:0/0 = 0
+1:0/0 = 0
+2:0/0 = 0
+3:0/0 = 0
+4:0/0 = 0
+0:1/0 = 0
+1:1/0 = 0
+2:1/0 = 0
+3:1/0 = 0
+4:1/0 = 0
+0:2/0 = 0
+1:2/0 = 0
+2:2/0 = 0
+
+[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_m1afb"]
+texture = ExtResource("2_sqirv")
+0:0/0 = 0
+1:0/0 = 0
+2:0/0 = 0
+0:1/0 = 0
+1:1/0 = 0
+2:1/0 = 0
+0:2/0 = 0
+1:2/0 = 0
+2:2/0 = 0
+0:3/0 = 0
+1:3/0 = 0
+0:4/0 = 0
+1:4/0 = 0
+0:5/0 = 0
+1:5/0 = 0
+2:5/0 = 0
+
+[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_g5f3g"]
+texture = ExtResource("3_c81vo")
+0:0/0 = 0
+1:0/0 = 0
+2:0/0 = 0
+0:1/0 = 0
+1:1/0 = 0
+2:1/0 = 0
+0:2/0 = 0
+1:2/0 = 0
+2:2/0 = 0
+
+[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_i4cc3"]
+texture = ExtResource("4_i6cpi")
+0:0/0 = 0
+
+[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_t6nqh"]
+texture = ExtResource("5_s20o0")
+0:0/0 = 0
+
+[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_t7gso"]
+texture = ExtResource("6_47trr")
+0:0/0 = 0
+1:0/0 = 0
+2:0/0 = 0
+0:1/0 = 0
+1:1/0 = 0
+2:1/0 = 0
+0:2/0 = 0
+1:2/0 = 0
+2:2/0 = 0
+0:3/0 = 0
+1:3/0 = 0
+0:4/0 = 0
+1:4/0 = 0
+0:5/0 = 0
+1:5/0 = 0
+2:5/0 = 0
+
+[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_qcfk6"]
+texture = ExtResource("7_mvv3g")
+0:0/0 = 0
+
+[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_iekw6"]
+texture = ExtResource("8_k8jdh")
+0:0/0 = 0
+1:0/0 = 0
+2:0/0 = 0
+0:1/0 = 0
+1:1/0 = 0
+2:1/0 = 0
+0:2/0 = 0
+1:2/0 = 0
+2:2/0 = 0
+0:3/0 = 0
+1:3/0 = 0
+0:4/0 = 0
+1:4/0 = 0
+0:5/0 = 0
+1:5/0 = 0
+2:5/0 = 0
+
+[sub_resource type="TileSet" id="TileSet_cb2k0"]
+sources/0 = SubResource("TileSetAtlasSource_5gc6g")
+sources/1 = SubResource("TileSetAtlasSource_m1afb")
+sources/2 = SubResource("TileSetAtlasSource_g5f3g")
+sources/3 = SubResource("TileSetAtlasSource_i4cc3")
+sources/4 = SubResource("TileSetAtlasSource_t6nqh")
+sources/5 = SubResource("TileSetAtlasSource_t7gso")
+sources/6 = SubResource("TileSetAtlasSource_qcfk6")
+sources/7 = SubResource("TileSetAtlasSource_iekw6")
+
+[node name="TileMap" type="TileMap"]
+tile_set = SubResource("TileSet_r3rok")
+format = 2
+
+[node name="TileMap" type="TileMap" parent="."]
+position = Vector2(78.88629, 469.9563)
+tile_set = SubResource("TileSet_cb2k0")
+format = 2
+layer_0/tile_data = PackedInt32Array(131082, 7, 0, 196618, 7, 1, 262154, 7, 2, 131083, 65543, 0, 196619, 65543, 1, 262155, 65543, 2, 131084, 131079, 0, 196620, 131079, 1, 262156, 131079, 2, 131080, 7, 3, 196616, 7, 4, 262152, 131079, 5, 131081, 65543, 3, 196617, 65543, 4, 262153, 65543, 5, 131078, 7, 3, 196614, 7, 4, 262150, 131079, 5, 131079, 65543, 3, 196615, 65543, 4, 262151, 65543, 5, 131076, 7, 3, 196612, 7, 4, 262148, 131079, 5, 131077, 65543, 3, 196613, 65543, 4, 262149, 65543, 5, 131074, 7, 3, 196610, 7, 4, 262146, 131079, 5, 131075, 65543, 3, 196611, 65543, 4, 262147, 65543, 5, 131072, 7, 3, 196608, 7, 4, 262144, 7, 5, 131073, 65543, 3, 196609, 65543, 4, 262145, 65543, 5, 65536, 3, 0, 65537, 3, 0, 65538, 3, 0, 65539, 3, 0, 65540, 3, 0, 65541, 3, 0, 65542, 3, 0, 65543, 3, 0, 65544, 3, 0, 65545, 3, 0, 65546, 4, 0, 65547, 4, 0, 65548, 4, 0, 65549, 4, 0, 65550, 4, 0, 65551, 4, 0, 65552, 3, 0, 65553, 3, 0, 65554, 3, 0, 65555, 3, 0, 65556, 3, 0, 65557, 3, 0, 65558, 3, 0, 65559, 3, 0, 65560, 3, 0, 65561, 3, 0, 65562, 3, 0, 65563, 3, 0, 65564, 3, 0, 65565, 3, 0, 65566, 3, 0, 65567, 3, 0, 65568, 3, 0, 65569, 3, 0, 131105, 4, 0, 196641, 3, 0, 262177, 3, 0, 262176, 3, 0, 262175, 3, 0, 262174, 3, 0, 262173, 3, 0, 262172, 3, 0, 262171, 3, 0, 262170, 3, 0, 262169, 3, 0, 262168, 3, 0, 262167, 3, 0, 262166, 3, 0, 262165, 3, 0, 262164, 3, 0, 262163, 3, 0, 262162, 3, 0, 262161, 3, 0, 262160, 3, 0, 262159, 3, 0, 262158, 3, 0, 262157, 3, 0, 131085, 3, 0, 131086, 3, 0, 196622, 3, 0, 196623, 3, 0, 196624, 3, 0, 196625, 3, 0, 196626, 3, 0, 196627, 3, 0, 196628, 3, 0, 196629, 3, 0, 196630, 3, 0, 196631, 3, 0, 196632, 3, 0, 196633, 3, 0, 196634, 3, 0, 196635, 3, 0, 196636, 3, 0, 196637, 3, 0, 196638, 3, 0, 196639, 3, 0, 196640, 3, 0, 131104, 4, 0, 131103, 4, 0, 131102, 4, 0, 131101, 4, 0, 131100, 4, 0, 131099, 4, 0, 131098, 4, 0, 131097, 4, 0, 131096, 4, 0, 131095, 4, 0, 131094, 4, 0, 131093, 4, 0, 131092, 4, 0, 131091, 4, 0, 131090, 4, 0, 131089, 4, 0, 131088, 4, 0, 131087, 3, 0, 196621, 3, 0, 131106, 4, 0, 131107, 4, 0, 131108, 4, 0, 131109, 4, 0, 131110, 4, 0, 131111, 4, 0, 131112, 4, 0, 131113, 4, 0, 131114, 4, 0)
