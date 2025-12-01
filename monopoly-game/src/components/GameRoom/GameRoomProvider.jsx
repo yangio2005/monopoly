@@ -3,7 +3,9 @@ import { useParams } from 'react-router-dom';
 import { useGameData } from './hooks/useGameData';
 import { useGameAudio } from './hooks/useGameAudio';
 import { useGameActions } from './hooks/useGameActions';
+import { useVoiceNotification } from './hooks/useVoiceNotification';
 import { BANK_UID } from './constants';
+import { database, ref, onValue } from '../../firebase';
 
 const GameRoomContext = createContext();
 
@@ -32,6 +34,9 @@ export const GameRoomProvider = ({ children }) => {
   const [gameUnit, setGameUnit] = useState(1);
   const [minTransferAmount, setMinTransferAmount] = useState(1);
 
+  // Voice Settings State
+  const [voiceSettings, setVoiceSettings] = useState(null);
+
   // Refs
   const playerRefs = useRef({});
   const bankRef = useRef(null);
@@ -42,6 +47,7 @@ export const GameRoomProvider = ({ children }) => {
   // Custom Hooks
   const { user, roomData, loading, error, bankAvatarURL } = useGameData(roomId);
   const { transferSound, clickSound, moneyReceivedSound } = useGameAudio();
+  const { announceMoneyReceived } = useVoiceNotification();
   const {
     transferError,
     setTransferError,
@@ -76,6 +82,20 @@ export const GameRoomProvider = ({ children }) => {
     setMinTransferAmount(gameUnit);
   }, [gameUnit]);
 
+  // Load user's voice settings
+  useEffect(() => {
+    if (user) {
+      const userRef = ref(database, 'users/' + user.uid);
+      const unsubscribe = onValue(userRef, (snapshot) => {
+        const data = snapshot.val();
+        if (data && data.voiceSettings) {
+          setVoiceSettings(data.voiceSettings);
+        }
+      });
+      return () => unsubscribe();
+    }
+  }, [user]);
+
   // Effects for Balance Updates & Animations
   useEffect(() => {
     if (user && roomData && roomData.players && roomData.players[user.uid]) {
@@ -87,7 +107,21 @@ export const GameRoomProvider = ({ children }) => {
       } else {
         const previousBalance = previousBalanceRef.current;
         if (currentBalance > previousBalance) {
+          const amountReceived = currentBalance - previousBalance;
+          const currencySymbol = roomData.currencySymbol || '₫';
+
           moneyReceivedSound.play();
+
+          // Use custom template if available
+          const options = {};
+          if (voiceSettings && voiceSettings.receivedTemplate) {
+            options.template = voiceSettings.receivedTemplate;
+          }
+          options.sender = 'Người gửi';
+          options.receiver = roomData.players[user.uid]?.name || 'bạn';
+
+          announceMoneyReceived(amountReceived, currencySymbol, options);
+
           setPlayersWithEffect(prev => [...prev, user.uid]);
           setTimeout(() => {
             setPlayersWithEffect(prev => prev.filter(id => id !== user.uid));
@@ -96,7 +130,7 @@ export const GameRoomProvider = ({ children }) => {
         previousBalanceRef.current = currentBalance;
       }
     }
-  }, [roomData, user, moneyReceivedSound]);
+  }, [roomData, user, moneyReceivedSound, announceMoneyReceived, voiceSettings]);
 
   useEffect(() => {
     if (playersToAnimate.length > 0) {

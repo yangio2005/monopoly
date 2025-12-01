@@ -5,8 +5,9 @@ import HomePage from './components/HomePage';
 import Navbar from './components/Navbar';
 import ProfilePage from './components/ProfilePage';
 import GameRoomPage from './components/GameRoomPage';
-import CharacterGameRoomPage from './components/CharacterGameRoomPage';
 import QrScannerPage from './components/QrScannerPage';
+import PixelMapPage from './components/PixelMapPage';
+import MartialArtsPerformance from './components/MartialArts/MartialArtsPerformance';
 
 function App() {
   return (
@@ -17,8 +18,9 @@ function App() {
         <Route path="/login" element={<LoginPage />} />
         <Route path="/profile" element={<ProfilePage />} />
         <Route path="/room/:roomId" element={<GameRoomPage />} />
-        <Route path="/character-room/:roomId" element={<CharacterGameRoomPage />} />
+        <Route path="/pixel-map" element={<PixelMapPage />} />
         <Route path="/scan-qr" element={<QrScannerPage />} />
+        <Route path="/performance" element={<MartialArtsPerformance />} />
       </Routes>
     </Router>
   );

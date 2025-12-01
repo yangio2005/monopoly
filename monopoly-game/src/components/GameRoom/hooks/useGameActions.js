@@ -1,12 +1,31 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { updateRoomSettings, performTransfer } from '../services/firebaseService';
 import { BANK_UID } from '../constants';
+import { useVoiceNotification } from './useVoiceNotification';
+
+import { database, ref, onValue } from '../../../firebase';
 
 export const useGameActions = (roomId, user, roomData, sounds) => {
     const [transferError, setTransferError] = useState('');
     const [isAnimating, setIsAnimating] = useState(false);
     const [animationDetails, setAnimationDetails] = useState(null);
     const [playersToAnimate, setPlayersToAnimate] = useState([]);
+    const [voiceSettings, setVoiceSettings] = useState(null);
+    const { announceMoneySent } = useVoiceNotification();
+
+    // Load user's voice settings
+    useEffect(() => {
+        if (user) {
+            const userRef = ref(database, 'users/' + user.uid);
+            const unsubscribe = onValue(userRef, (snapshot) => {
+                const data = snapshot.val();
+                if (data && data.voiceSettings) {
+                    setVoiceSettings(data.voiceSettings);
+                }
+            });
+            return () => unsubscribe();
+        }
+    }, [user]);
 
     const handleUpdateInitialBalance = async (newInitialBalance, setNewInitialBalance) => {
         if (user.uid !== BANK_UID) {
@@ -82,9 +101,23 @@ export const useGameActions = (roomId, user, roomData, sounds) => {
         }
 
         try {
-            await performTransfer(roomId, user.uid, recipientId, parsedAmount, roomData);
+            await performTransfer(roomId, user.uid, recipientId, parsedAmount);
 
             sounds.transferSound.play();
+
+            // Announce money sent with voice
+            const currencySymbol = roomData.currencySymbol || '₫';
+            const options = {};
+            if (voiceSettings && voiceSettings.sentTemplate) {
+                options.template = voiceSettings.sentTemplate;
+            }
+            options.sender = roomData.players[user.uid]?.name || 'Bạn';
+            options.receiver = recipientId === BANK_UID
+                ? 'Ngân hàng'
+                : (roomData.players[recipientId]?.name || 'Người nhận');
+
+            announceMoneySent(parsedAmount, currencySymbol, options);
+
             setPlayersToAnimate([user.uid, recipientId]);
 
             if (onSuccess) onSuccess();

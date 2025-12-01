@@ -64,6 +64,25 @@ const Navbar = () => {
           {/* Right Section - Desktop Menu */}
           <div className="hidden md:flex items-center gap-3">
             <Link
+              to="/pixel-map"
+              className="group relative px-4 py-2 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 hover:border-purple-400/50 transition-all duration-300 overflow-hidden"
+            >
+              <div className="absolute inset-0 bg-gradient-to-r from-purple-600/0 via-purple-600/20 to-purple-600/0 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700"></div>
+              <div className="relative flex items-center gap-2">
+                <svg
+                  className="w-5 h-5 text-purple-300 group-hover:text-purple-200 transition-colors"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7" />
+                </svg>
+                <span className="text-sm font-medium text-purple-100 group-hover:text-white transition-colors">
+                  Map
+                </span>
+              </div>
+            </Link>
+            <Link
               to="/profile"
               className="group relative px-4 py-2 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 hover:border-purple-400/50 transition-all duration-300 overflow-hidden"
             >
@@ -131,6 +150,23 @@ const Navbar = () => {
           }`}
       >
         <div className="px-4 pt-2 pb-4 space-y-2 bg-gradient-to-b from-purple-900/50 to-indigo-900/50 backdrop-blur-sm border-t border-purple-500/20">
+          <Link
+            to="/pixel-map"
+            onClick={() => setIsMobileMenuOpen(false)}
+            className="flex items-center gap-3 px-4 py-3 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 hover:border-purple-400/50 transition-all duration-300 group"
+          >
+            <svg
+              className="w-5 h-5 text-purple-300 group-hover:text-purple-200 transition-colors"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7" />
+            </svg>
+            <span className="text-sm font-medium text-purple-100 group-hover:text-white transition-colors">
+              Map
+            </span>
+          </Link>
           <Link
             to="/profile"
             onClick={() => setIsMobileMenuOpen(false)}
