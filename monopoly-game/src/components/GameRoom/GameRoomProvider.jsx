@@ -9,6 +9,7 @@ import { database, ref, onValue } from '../../firebase';
 
 const GameRoomContext = createContext();
 
+// eslint-disable-next-line react-refresh/only-export-components
 export const useGameRoom = () => {
   return useContext(GameRoomContext);
 };

@@ -9,6 +9,7 @@ import QrScannerPage from './components/QrScannerPage';
 import PixelMapPage from './components/PixelMapPage';
 import MartialArtsPerformance from './components/MartialArts/MartialArtsPerformance';
 import CharacterShowcase from './components/CharacterShowcase/CharacterShowcase';
+import DocsPage from './components/DocsPage';
 
 function App() {
   return (
@@ -23,6 +24,7 @@ function App() {
         <Route path="/scan-qr" element={<QrScannerPage />} />
         <Route path="/performance" element={<MartialArtsPerformance />} />
         <Route path="/showcase" element={<CharacterShowcase />} />
+        <Route path="/docs" element={<DocsPage />} />
       </Routes>
     </Router>
   );

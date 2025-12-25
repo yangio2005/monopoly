@@ -108,7 +108,7 @@ const CalculatorInput = ({ value, onValueChange, onCalculatedValue }) => {
       setIsResultDisplayed(false);
     } else {
       // Prevent multiple decimals in a single number segment
-      const parts = newExpression.substring(0, cursorPosition).split(/[+\-*\/]/)
+      const parts = newExpression.substring(0, cursorPosition).split(/[+\-*/]/);
       const currentNumber = parts[parts.length - 1];
       if (!currentNumber.includes('.')) {
         newExpression = insertAtCursor(newExpression, '.', cursorPosition);
