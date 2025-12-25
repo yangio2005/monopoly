@@ -2,9 +2,10 @@ import React, { useState } from 'react';
 
 const CreateRoomForm = ({ onCreateRoom, isLoading, clickSound }) => {
     const [roomName, setRoomName] = useState('');
+    const [initialBalance, setInitialBalance] = useState('');
 
     const handleSubmit = () => {
-        onCreateRoom(roomName);
+        onCreateRoom(roomName, initialBalance);
         clickSound.play();
     };
 
@@ -23,6 +24,14 @@ const CreateRoomForm = ({ onCreateRoom, isLoading, clickSound }) => {
                 value={roomName}
                 onChange={(e) => setRoomName(e.target.value)}
                 required
+            />
+            <input
+                type="number"
+                className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all duration-300 hover:bg-white/10 mb-3"
+                placeholder="Initial Balance (Default: 1500)"
+                value={initialBalance}
+                onChange={(e) => setInitialBalance(e.target.value)}
+                min="1"
             />
             <button
                 onClick={handleSubmit}

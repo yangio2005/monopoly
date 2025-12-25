@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useState } from 'react';
 
 const SpriteAnimator = ({
     src,
@@ -13,7 +13,6 @@ const SpriteAnimator = ({
     style = {}
 }) => {
     const [currentFrame, setCurrentFrame] = useState(0);
-    const timerRef = useRef(null);
     const frameDuration = 1000 / fps;
 
     useEffect(() => {

@@ -10,7 +10,7 @@ const HomePage = () => {
     const navigate = useNavigate();
     const [clickSound] = useState(new Howl({ src: ['/click.mp3'] }));
 
-    const { user, rooms, error, setError, isLoading, createRoom, joinRoom } = useRoomManagement(navigate);
+    const { user, rooms, error, isLoading, createRoom, joinRoom } = useRoomManagement(navigate);
 
     if (!user) {
         return (

@@ -1,0 +1,186 @@
+.game-room-characters {
+    position: fixed;
+    top: 80px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 15px;
+    z-index: 999;
+    pointer-events: none;
+}
+
+.character-mini {
+    position: relative;
+    opacity: 0.85;
+    transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    animation: idle-dance 2s ease-in-out infinite;
+}
+
+.character-mini:nth-child(1) {
+    animation-delay: 0s;
+}
+
+.character-mini:nth-child(2) {
+    animation-delay: 0.3s;
+}
+
+.character-mini:nth-child(3) {
+    animation-delay: 0.6s;
+}
+
+@keyframes idle-dance {
+
+    0%,
+    100% {
+        transform: translateY(0px);
+    }
+
+    50% {
+        transform: translateY(-8px);
+    }
+}
+
+.character-mini.reacting {
+    opacity: 1;
+    transform: scale(1.15) translateY(-5px);
+}
+
+.character-mini-sprite {
+    width: 80px;
+    height: 80px;
+    background-size: cover;
+    background-repeat: no-repeat;
+    image-rendering: pixelated;
+    filter: drop-shadow(0 3px 10px rgba(0, 0, 0, 0.6));
+}
+
+.mini-chat-bubble {
+    position: absolute;
+    bottom: 90px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: white;
+    padding: 8px 14px;
+    border-radius: 14px;
+    font-size: 0.8rem;
+    font-weight: 700;
+    white-space: nowrap;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.25);
+    animation: bubble-pop 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    z-index: 10;
+}
+
+.mini-chat-bubble::after {
+    content: '';
+    position: absolute;
+    bottom: -8px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 0;
+    height: 0;
+    border-left: 8px solid transparent;
+    border-right: 8px solid transparent;
+    border-top: 8px solid white;
+}
+
+.mini-chat-bubble.received {
+    background: linear-gradient(135deg, #84fab0 0%, #8fd3f4 100%);
+    color: #0d4a3e;
+}
+
+.mini-chat-bubble.received::after {
+    border-top-color: #8fd3f4;
+}
+
+.mini-chat-bubble.sent {
+    background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+    color: #8b1f41;
+}
+
+.mini-chat-bubble.sent::after {
+    border-top-color: #fee140;
+}
+
+@keyframes bubble-pop {
+    0% {
+        transform: translateX(-50%) scale(0);
+        opacity: 0;
+    }
+
+    50% {
+        transform: translateX(-50%) scale(1.1);
+    }
+
+    100% {
+        transform: translateX(-50%) scale(1);
+        opacity: 1;
+    }
+}
+
+/* Sprite animations */
+@keyframes sprite-Idle {
+    0% {
+        background-position-x: 0;
+    }
+
+    100% {
+        background-position-x: -512px;
+    }
+}
+
+@keyframes sprite-Jump {
+    0% {
+        background-position-x: 0;
+    }
+
+    100% {
+        background-position-x: -1024px;
+    }
+}
+
+@keyframes sprite-Hurt {
+    0% {
+        background-position-x: 0;
+    }
+
+    100% {
+        background-position-x: -512px;
+    }
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .game-room-characters {
+        top: 70px;
+        gap: 10px;
+    }
+
+    .character-mini-sprite {
+        width: 60px;
+        height: 60px;
+    }
+
+    .mini-chat-bubble {
+        bottom: 70px;
+        font-size: 0.7rem;
+        padding: 6px 10px;
+    }
+}
+
+@media (max-width: 480px) {
+    .game-room-characters {
+        top: 65px;
+        gap: 8px;
+    }
+
+    .character-mini-sprite {
+        width: 48px;
+        height: 48px;
+    }
+
+    .mini-chat-bubble {
+        bottom: 55px;
+        font-size: 0.65rem;
+        padding: 4px 8px;
+    }
+}

@@ -1,22 +1,16 @@
 import React from 'react';
 import { useGameRoom } from './GameRoomProvider';
-import { formatCurrency } from '../../utils/formatters.jsx';
 
 const BankSettingsModal = () => {
   const {
     user,
     roomData,
-    newInitialBalance,
-    setNewInitialBalance,
-    handleUpdateInitialBalance,
     newCurrencySymbol,
     setNewCurrencySymbol,
     newCurrencyCode,
     setNewCurrencyCode,
     handleUpdateCurrencySettings,
     BANK_UID,
-    currencySymbol,
-    currencyCode,
     newGameUnit,
     setNewGameUnit,
     showBankSettingsModal,
@@ -51,35 +45,7 @@ const BankSettingsModal = () => {
         </div>
 
         <div className="p-6 space-y-6">
-          {/* Initial Balance */}
-          <div className="space-y-2">
-            <label htmlFor="initialBalanceInput" className="block text-sm font-mono text-yellow-400">INITIAL PLAYER BALANCE</label>
-            <div className="flex gap-2">
-              <div className="relative flex-grow">
-                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 font-mono">{currencySymbol}</span>
-                <input
-                  type="number"
-                  className="w-full bg-black/50 border border-white/10 rounded-lg py-2 pl-8 pr-3 text-white focus:outline-none focus:border-yellow-500 transition-colors font-mono"
-                  id="initialBalanceInput"
-                  value={newInitialBalance}
-                  onChange={(e) => setNewInitialBalance(e.target.value)}
-                  placeholder="e.g., 1500"
-                />
-              </div>
-              <button
-                className="px-4 py-2 bg-yellow-500/20 hover:bg-yellow-500/30 border border-yellow-500/50 text-yellow-400 rounded-lg transition-all font-mono text-sm"
-                type="button"
-                onClick={handleUpdateInitialBalance}
-              >
-                SET
-              </button>
-            </div>
-            {roomData.initialPlayerBalance && (
-              <div className="text-xs font-mono text-gray-500">
-                CURRENT: <span className="text-white">{formatCurrency(roomData.initialPlayerBalance, currencySymbol, currencyCode)}</span>
-              </div>
-            )}
-          </div>
+
 
           <div className="grid grid-cols-2 gap-4">
             {/* Currency Symbol */}

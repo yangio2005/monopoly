@@ -5,7 +5,7 @@ import { useVoiceNotification } from './useVoiceNotification';
 
 import { database, ref, onValue } from '../../../firebase';
 
-export const useGameActions = (roomId, user, roomData, sounds) => {
+export const useGameActions = (roomId, user, roomData, sounds, callbacks = {}) => {
     const [transferError, setTransferError] = useState('');
     const [isAnimating, setIsAnimating] = useState(false);
     const [animationDetails, setAnimationDetails] = useState(null);
@@ -117,6 +117,11 @@ export const useGameActions = (roomId, user, roomData, sounds) => {
                 : (roomData.players[recipientId]?.name || 'Người nhận');
 
             announceMoneySent(parsedAmount, currencySymbol, options);
+
+            // Trigger character reaction for sent money
+            if (callbacks.onTransferSent) {
+                callbacks.onTransferSent();
+            }
 
             setPlayersToAnimate([user.uid, recipientId]);
 

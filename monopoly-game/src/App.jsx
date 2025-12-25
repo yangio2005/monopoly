@@ -8,6 +8,7 @@ import GameRoomPage from './components/GameRoomPage';
 import QrScannerPage from './components/QrScannerPage';
 import PixelMapPage from './components/PixelMapPage';
 import MartialArtsPerformance from './components/MartialArts/MartialArtsPerformance';
+import CharacterShowcase from './components/CharacterShowcase/CharacterShowcase';
 
 function App() {
   return (
@@ -21,6 +22,7 @@ function App() {
         <Route path="/pixel-map" element={<PixelMapPage />} />
         <Route path="/scan-qr" element={<QrScannerPage />} />
         <Route path="/performance" element={<MartialArtsPerformance />} />
+        <Route path="/showcase" element={<CharacterShowcase />} />
       </Routes>
     </Router>
   );

@@ -8,9 +8,10 @@ import TransactionLog from './GameRoom/TransactionLog';
 import BankSettingsModal from './GameRoom/BankSettingsModal';
 import WealthChartModal from './GameRoom/WealthChartModal';
 import { GameRoomProvider, useGameRoom } from './GameRoom/GameRoomProvider';
+import GameRoomCharacters from './GameRoom/GameRoomCharacters';
 
 const GameRoomContent = () => {
-  const { roomId, roomData, loading, error, setShowShareModal, clickSound, isAnimating, animationDetails, user, BANK_UID, setShowBankSettingsModal, showWealthModal, setShowWealthModal } = useGameRoom();
+  const { roomId, roomData, loading, error, setShowShareModal, clickSound, isAnimating, animationDetails, user, BANK_UID, setShowBankSettingsModal, showWealthModal, setShowWealthModal, characterTransactionType } = useGameRoom();
 
   if (loading) {
     return (
@@ -123,6 +124,7 @@ const GameRoomContent = () => {
       <BankSettingsModal />
       <WealthChartModal isOpen={showWealthModal} onClose={() => setShowWealthModal(false)} />
       <MoneyTransferAnimation isAnimating={isAnimating} animationDetails={animationDetails} />
+      <GameRoomCharacters transactionType={characterTransactionType} />
     </div>
   );
 };

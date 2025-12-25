@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { auth, database, ref, set, onValue } from '../../firebase';
 import { onAuthStateChanged } from 'firebase/auth';
 import { useVoiceNotification } from '../GameRoom/hooks/useVoiceNotification';
-import CharacterSelector, { CHARACTERS } from '../CharacterSelector';
+
 import ProfileSidebar from './ProfileSidebar';
 import BasicInfo from './BasicInfo';
 import VoiceSettings from './VoiceSettings';
@@ -11,7 +11,6 @@ const ProfilePage = () => {
     const [user, setUser] = useState(null);
     const [name, setName] = useState('');
     const [avatarURL, setAvatarURL] = useState('');
-    const [characterId, setCharacterId] = useState('male-1'); // Default character
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
     const [successMsg, setSuccessMsg] = useState('');
@@ -34,7 +33,6 @@ const ProfilePage = () => {
                     if (data) {
                         setName(data.name || '');
                         setAvatarURL(data.avatarURL || '');
-                        setCharacterId(data.characterId || 'male-1');
 
                         // Load voice settings
                         if (data.voiceSettings) {
@@ -69,7 +67,6 @@ const ProfilePage = () => {
                 await set(ref(database, 'users/' + user.uid), {
                     name: name,
                     avatarURL: avatarURL,
-                    characterId: characterId,
                     voiceSettings: {
                         sentTemplate: sentTemplate,
                         receivedTemplate: receivedTemplate,
@@ -124,7 +121,6 @@ const ProfilePage = () => {
         );
     }
 
-    const selectedCharacter = CHARACTERS.find(c => c.id === characterId) || CHARACTERS[0];
 
     return (
         <div className="min-h-screen bg-[#0a0a0f] bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-purple-900/20 via-gray-900 to-black text-gray-100 pt-24 pb-12 px-4 sm:px-6 lg:px-8">
@@ -142,7 +138,6 @@ const ProfilePage = () => {
                                 user={user}
                                 name={name}
                                 avatarURL={avatarURL}
-                                selectedCharacter={selectedCharacter}
                             />
 
                             {/* Right Column: Form */}
@@ -185,13 +180,6 @@ const ProfilePage = () => {
                                         handleTestSent={handleTestSent}
                                         handleTestReceived={handleTestReceived}
                                     />
-
-                                    <div className="space-y-2">
-                                        <CharacterSelector
-                                            selectedCharacterId={characterId}
-                                            onSelect={setCharacterId}
-                                        />
-                                    </div>
 
                                     <div className="pt-4">
                                         <button

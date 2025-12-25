@@ -11,7 +11,7 @@ export const useVoiceNotification = () => {
             utterance.lang = lang;
             utterance.rate = 1.0; // Normal speed
             utterance.pitch = 1.0; // Normal pitch
-            utterance.volume = 0.8; // Slightly lower volume to not overpower game sounds
+            utterance.volume = 1.0; // Maximum volume
 
             // Add a small delay to ensure previous speech is cancelled
             setTimeout(() => {

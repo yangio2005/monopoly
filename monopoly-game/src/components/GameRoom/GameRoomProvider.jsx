@@ -41,8 +41,10 @@ export const GameRoomProvider = ({ children }) => {
   const playerRefs = useRef({});
   const bankRef = useRef(null);
   const previousBalanceRef = useRef(0);
+  const transactionTimeoutRef = useRef(null);
   const isInitialMount = useRef(true);
   const [playersWithEffect, setPlayersWithEffect] = useState([]);
+  const [characterTransactionType, setCharacterTransactionType] = useState(null);
 
   // Custom Hooks
   const { user, roomData, loading, error, bankAvatarURL } = useGameData(roomId);
@@ -60,7 +62,13 @@ export const GameRoomProvider = ({ children }) => {
     handleUpdateInitialBalance: updateInitialBalanceAction,
     handleUpdateGameSettings: updateGameSettingsAction,
     handleTransfer: transferAction
-  } = useGameActions(roomId, user, roomData, { transferSound });
+  } = useGameActions(roomId, user, roomData, { transferSound }, {
+    onTransferSent: () => {
+      if (transactionTimeoutRef.current) clearTimeout(transactionTimeoutRef.current);
+      setCharacterTransactionType({ type: 'sent', timestamp: Date.now() });
+      transactionTimeoutRef.current = setTimeout(() => setCharacterTransactionType(null), 12000);
+    }
+  });
 
   // Effects for Room Settings
   useEffect(() => {
@@ -122,6 +130,11 @@ export const GameRoomProvider = ({ children }) => {
 
           announceMoneyReceived(amountReceived, currencySymbol, options);
 
+          // Trigger character reaction
+          if (transactionTimeoutRef.current) clearTimeout(transactionTimeoutRef.current);
+          setCharacterTransactionType({ type: 'received', timestamp: Date.now() });
+          transactionTimeoutRef.current = setTimeout(() => setCharacterTransactionType(null), 12000);
+
           setPlayersWithEffect(prev => [...prev, user.uid]);
           setTimeout(() => {
             setPlayersWithEffect(prev => prev.filter(id => id !== user.uid));
@@ -143,7 +156,7 @@ export const GameRoomProvider = ({ children }) => {
       });
       setPlayersToAnimate([]);
     }
-  }, [playersToAnimate, moneyReceivedSound]);
+  }, [playersToAnimate, moneyReceivedSound, setPlayersToAnimate]);
 
   // Handlers
   const handleUpdateInitialBalance = () => {
@@ -226,6 +239,8 @@ export const GameRoomProvider = ({ children }) => {
     handleUpdateCurrencySettings,
     handleTransfer,
     BANK_UID,
+    characterTransactionType,
+    setCharacterTransactionType,
   };
 
   return (

@@ -5,7 +5,7 @@ const RoomList = ({ rooms, onJoinRoom, isLoading, clickSound }) => {
     const [searchQuery, setSearchQuery] = useState('');
 
     // Filter rooms based on time and search query with OR logic
-    const filteredRooms = Object.entries(rooms).filter(([roomId, roomData]) => {
+    const filteredRooms = Object.entries(rooms).filter(([, roomData]) => {
         const now = Date.now();
         const daysToMs = timeFilter === '7days' ? 7 * 24 * 60 * 60 * 1000 : 30 * 24 * 60 * 60 * 1000;
         const timeThreshold = now - daysToMs;
@@ -48,8 +48,8 @@ const RoomList = ({ rooms, onJoinRoom, isLoading, clickSound }) => {
                         <button
                             onClick={() => setTimeFilter('7days')}
                             className={`px-4 py-2 rounded-xl font-medium text-sm transition-all ${timeFilter === '7days'
-                                    ? 'bg-yellow-500/20 border border-yellow-500/50 text-yellow-300'
-                                    : 'bg-white/5 border border-white/10 text-gray-400 hover:bg-white/10'
+                                ? 'bg-yellow-500/20 border border-yellow-500/50 text-yellow-300'
+                                : 'bg-white/5 border border-white/10 text-gray-400 hover:bg-white/10'
                                 }`}
                         >
                             7 Days
@@ -57,8 +57,8 @@ const RoomList = ({ rooms, onJoinRoom, isLoading, clickSound }) => {
                         <button
                             onClick={() => setTimeFilter('30days')}
                             className={`px-4 py-2 rounded-xl font-medium text-sm transition-all ${timeFilter === '30days'
-                                    ? 'bg-yellow-500/20 border border-yellow-500/50 text-yellow-300'
-                                    : 'bg-white/5 border border-white/10 text-gray-400 hover:bg-white/10'
+                                ? 'bg-yellow-500/20 border border-yellow-500/50 text-yellow-300'
+                                : 'bg-white/5 border border-white/10 text-gray-400 hover:bg-white/10'
                                 }`}
                         >
                             30 Days

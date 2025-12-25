@@ -15,7 +15,7 @@ const CalculatorInput = ({ value, onValueChange, onCalculatedValue }) => {
       setCalculatedResult(null); // Clear calculated result if external value changes
       setIsResultDisplayed(false);
     }
-  }, [value]);
+  }, [value, expression]);
 
   useEffect(() => {
     if (inputRef.current) {
@@ -108,7 +108,7 @@ const CalculatorInput = ({ value, onValueChange, onCalculatedValue }) => {
       setIsResultDisplayed(false);
     } else {
       // Prevent multiple decimals in a single number segment
-      const parts = newExpression.substring(0, cursorPosition).split(/[+\-*\/]/);
+      const parts = newExpression.substring(0, cursorPosition).split(/[+\-*\/]/)
       const currentNumber = parts[parts.length - 1];
       if (!currentNumber.includes('.')) {
         newExpression = insertAtCursor(newExpression, '.', cursorPosition);
@@ -156,7 +156,7 @@ const CalculatorInput = ({ value, onValueChange, onCalculatedValue }) => {
         if (onCalculatedValue) {
           onCalculatedValue(result);
         }
-      } catch (e) {
+      } catch {
         setExpression('Error');
         setIsResultDisplayed(true);
         setCursorPosition('Error'.length);

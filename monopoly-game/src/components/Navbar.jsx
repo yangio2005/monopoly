@@ -83,6 +83,25 @@ const Navbar = () => {
               </div>
             </Link>
             <Link
+              to="/showcase"
+              className="group relative px-4 py-2 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 hover:border-purple-400/50 transition-all duration-300 overflow-hidden"
+            >
+              <div className="absolute inset-0 bg-gradient-to-r from-purple-600/0 via-purple-600/20 to-purple-600/0 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700"></div>
+              <div className="relative flex items-center gap-2">
+                <svg
+                  className="w-5 h-5 text-purple-300 group-hover:text-purple-200 transition-colors"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14.828 14.828a4 4 0 01-5.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                <span className="text-sm font-medium text-purple-100 group-hover:text-white transition-colors">
+                  Showcase
+                </span>
+              </div>
+            </Link>
+            <Link
               to="/profile"
               className="group relative px-4 py-2 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 hover:border-purple-400/50 transition-all duration-300 overflow-hidden"
             >
@@ -165,6 +184,23 @@ const Navbar = () => {
             </svg>
             <span className="text-sm font-medium text-purple-100 group-hover:text-white transition-colors">
               Map
+            </span>
+          </Link>
+          <Link
+            to="/showcase"
+            onClick={() => setIsMobileMenuOpen(false)}
+            className="flex items-center gap-3 px-4 py-3 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 hover:border-purple-400/50 transition-all duration-300 group"
+          >
+            <svg
+              className="w-5 h-5 text-purple-300 group-hover:text-purple-200 transition-colors"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14.828 14.828a4 4 0 01-5.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            <span className="text-sm font-medium text-purple-100 group-hover:text-white transition-colors">
+              Showcase
             </span>
           </Link>
           <Link

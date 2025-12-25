@@ -72,7 +72,7 @@ const PixelMapPage = () => {
         const loadImages = async () => {
             const loadedImages = {};
             const promises = Object.entries(ASSETS).map(([key, src]) => {
-                return new Promise((resolve, reject) => {
+                return new Promise((resolve) => {
                     const img = new Image();
                     img.src = src;
                     img.onload = () => {
@@ -101,11 +101,10 @@ const PixelMapPage = () => {
 
         const ctx = canvasRef.current.getContext('2d');
         let animationFrameId;
-        let lastTimestamp = 0;
         const FPS = 10; // Spritesheet animation speed
         const ANIMATION_SPEED = 0.02; // Movement speed
 
-        const draw = (timestamp) => {
+        const draw = () => {
             // Clear canvas
             ctx.fillStyle = '#1a1a2e';
             ctx.fillRect(0, 0, canvasRef.current.width, canvasRef.current.height);
@@ -264,7 +263,7 @@ const PixelMapPage = () => {
                 const newProgress = Math.min(prev.progress + 0.02, 1);
 
                 // Update item progress (items follow with slight delay)
-                const newItems = prev.items.map((item, index) => ({
+                const newItems = prev.items.map((item) => ({
                     ...item,
                     progress: Math.min(item.progress + 0.015, 1)
                 }));

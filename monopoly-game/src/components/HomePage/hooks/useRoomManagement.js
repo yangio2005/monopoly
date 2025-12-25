@@ -29,7 +29,7 @@ export const useRoomManagement = (navigate) => {
         });
     }, []);
 
-    const createRoom = async (roomName) => {
+    const createRoom = async (roomName, initialBalanceInput) => {
         if (!user) {
             setError("You must be logged in to create a room.");
             return;
@@ -38,6 +38,13 @@ export const useRoomManagement = (navigate) => {
             setError("Room name cannot be empty.");
             return;
         }
+
+        const initialBalance = initialBalanceInput ? parseInt(initialBalanceInput) : 1500;
+        if (isNaN(initialBalance) || initialBalance <= 0) {
+            setError("Initial balance must be a positive number.");
+            return;
+        }
+
         setError('');
         setIsLoading(true);
         try {
@@ -55,7 +62,7 @@ export const useRoomManagement = (navigate) => {
             const initialPlayers = {
                 [user.uid]: {
                     name: playerName,
-                    balance: 1500,
+                    balance: initialBalance,
                     position: 0,
                     properties: {},
                     avatarURL: playerAvatarURL
@@ -68,6 +75,7 @@ export const useRoomManagement = (navigate) => {
                 players: initialPlayers,
                 turn: user.uid,
                 bank: 100000,
+                initialPlayerBalance: initialBalance, // Store the setting
                 log: [],
                 createdAt: Date.now() // Timestamp for filtering
             });
@@ -107,10 +115,13 @@ export const useRoomManagement = (navigate) => {
                 if (snapshot.exists()) {
                     const roomData = snapshot.val();
                     if (!roomData.players || !roomData.players[user.uid]) {
+                        // Use the room's configured initial balance, or default to 1500 if missing
+                        const startingBalance = roomData.initialPlayerBalance || 1500;
+
                         const playerRef = ref(database, `rooms/${targetRoomId}/players/${user.uid}`);
                         await set(playerRef, {
                             name: playerName,
-                            balance: 1500,
+                            balance: startingBalance,
                             position: 0,
                             properties: {},
                             avatarURL: playerAvatarURL

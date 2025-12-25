@@ -1,6 +1,7 @@
 import React from 'react';
 import { useGameRoom } from './GameRoomProvider';
 import { formatCurrency } from '../../utils/formatters.jsx';
+import AvatarFrame from './AvatarFrame';
 
 const MobilePlayerList = () => {
     const {
@@ -23,6 +24,9 @@ const MobilePlayerList = () => {
 
     const players = roomData.players ? Object.entries(roomData.players).filter(([uid]) => uid !== BANK_UID) : [];
     const bank = { name: "Bank", balance: roomData.bank || 0, avatarURL: bankAvatarURL };
+
+    // Calculate Total Money (excluding Bank)
+    const totalMoney = players.reduce((sum, [, p]) => sum + (p.balance || 0), 0);
 
     return (
         <div className="flex flex-col gap-4">
@@ -82,23 +86,31 @@ const MobilePlayerList = () => {
                 `}
                             >
                                 <div className="relative">
+                                    {/* Dynamic Avatar Frame */}
+                                    <AvatarFrame
+                                        balance={playerData.balance}
+                                        totalMoney={totalMoney}
+                                        size={100}
+                                        offset={26}
+                                    />
+
                                     {playerData.avatarURL ? (
                                         <img
                                             src={playerData.avatarURL}
                                             alt="Avatar"
-                                            className={`w-12 h-12 rounded-lg object-cover border-2 ${isSelected ? 'border-cyan-400' : 'border-white/20'}`}
+                                            className={`w-12 h-12 rounded-full object-cover border-2 relative z-10 ${isSelected ? 'border-cyan-400' : 'border-white/20'}`}
                                         />
                                     ) : (
-                                        <div className={`w-12 h-12 rounded-lg flex items-center justify-center border-2 ${isSelected ? 'border-cyan-400 bg-cyan-500/20' : 'border-white/20 bg-white/5'}`}>
+                                        <div className={`w-12 h-12 rounded-full flex items-center justify-center border-2 relative z-10 ${isSelected ? 'border-cyan-400 bg-cyan-500/20' : 'border-white/20 bg-white/5'}`}>
                                             <span className="text-xl">👤</span>
                                         </div>
                                     )}
                                     {isCurrentUser && (
-                                        <div className="absolute -top-1 -right-1 w-3 h-3 bg-green-500 rounded-full border-2 border-black"></div>
+                                        <div className="absolute -top-1 -right-1 w-3 h-3 bg-green-500 rounded-full border-2 border-black z-30"></div>
                                     )}
                                 </div>
 
-                                <div className="text-center w-full overflow-hidden">
+                                <div className="text-center w-full overflow-hidden mt-4">
                                     <h6 className={`text-sm font-bold truncate mb-1 ${isSelected ? 'text-cyan-300' : 'text-gray-200'}`}>
                                         {playerData.name}
                                     </h6>
