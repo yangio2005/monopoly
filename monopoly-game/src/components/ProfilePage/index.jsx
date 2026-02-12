@@ -123,15 +123,23 @@ const ProfilePage = () => {
 
 
     return (
-        <div className="min-h-screen bg-[#0a0a0f] bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-purple-900/20 via-gray-900 to-black text-gray-100 pt-24 pb-12 px-4 sm:px-6 lg:px-8">
+        <div className="min-h-screen bg-[#050505] text-[#aaa] pt-24 pb-12 px-4 sm:px-6 lg:px-8 font-retro">
             <div className="max-w-4xl mx-auto">
-                <div className="relative bg-white/5 border border-white/10 backdrop-blur-xl rounded-2xl shadow-2xl overflow-hidden">
+                {/* Main Retro Terminal Frame */}
+                <div className="relative bg-[#0a0a0a] border-[4px] border-[#333] shadow-[0_30px_90px_rgba(0,0,0,0.8)] overflow-hidden">
 
-                    {/* Header Decoration */}
-                    <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-cyan-500 via-purple-500 to-pink-500"></div>
+                    {/* Header Bar */}
+                    <div className="h-10 bg-[#1a1a1a] border-b-[2px] border-[#333] flex items-center justify-between px-4">
+                        <div className="flex gap-2">
+                            <div className="w-3 h-3 bg-[#ff4d4d] border border-black/20"></div>
+                            <div className="w-3 h-3 bg-[#ffcc00] border border-black/20"></div>
+                            <div className="w-3 h-3 bg-[#40ffcc] border border-black/20"></div>
+                        </div>
+                        <span className="text-[10px] font-black tracking-widest text-[#555]">USER_PROFILE_SYSTEM_V4.0</span>
+                    </div>
 
-                    <div className="p-6 sm:p-10">
-                        <div className="flex flex-col md:flex-row gap-8 items-start">
+                    <div className="p-6 md:p-10">
+                        <div className="flex flex-col md:flex-row gap-12 items-start">
 
                             {/* Left Column: Avatar & Info */}
                             <ProfileSidebar
@@ -141,22 +149,24 @@ const ProfilePage = () => {
                             />
 
                             {/* Right Column: Form */}
-                            <div className="w-full md:w-2/3">
-                                <h3 className="text-xl font-bold text-white mb-6 flex items-center gap-2">
-                                    <svg className="w-5 h-5 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg>
-                                    Edit Profile
-                                </h3>
+                            <div className="w-full md:w-2/3 space-y-8">
+                                <div className="flex items-center gap-4 mb-2">
+                                    <h3 className="text-[18px] font-black text-[#ffcc00] uppercase tracking-wider italic">
+                                        EDIT_IDENTITY
+                                    </h3>
+                                    <div className="h-[2px] flex-1 bg-gradient-to-r from-[#ffcc00]/50 to-transparent"></div>
+                                </div>
 
-                                <form onSubmit={handleSaveProfile} className="space-y-6">
+                                <form onSubmit={handleSaveProfile} className="space-y-8">
                                     {error && (
-                                        <div className="p-4 bg-red-900/20 border border-red-500/50 rounded-lg text-red-400 text-sm flex items-center gap-3">
-                                            <span>⚠️</span> {error}
+                                        <div className="p-4 bg-red-950/20 border-l-[4px] border-red-600 text-red-500 text-xs font-black uppercase animate-pulse">
+                                            [!] ERROR: {error}
                                         </div>
                                     )}
 
                                     {successMsg && (
-                                        <div className="p-4 bg-green-900/20 border border-green-500/50 rounded-lg text-green-400 text-sm flex items-center gap-3">
-                                            <span>✅</span> {successMsg}
+                                        <div className="p-4 bg-cyan-950/20 border-l-[4px] border-[#40ffcc] text-[#40ffcc] text-xs font-black uppercase">
+                                            [+] STATUS: {successMsg}
                                         </div>
                                     )}
 
@@ -181,17 +191,23 @@ const ProfilePage = () => {
                                         handleTestReceived={handleTestReceived}
                                     />
 
-                                    <div className="pt-4">
+                                    <div className="pt-6 border-t border-[#222]">
                                         <button
                                             type="submit"
-                                            className="w-full py-3 px-4 bg-gradient-to-r from-purple-600 to-cyan-600 hover:from-purple-500 hover:to-cyan-500 text-white font-bold rounded-lg shadow-lg shadow-purple-500/20 transition-all transform hover:scale-[1.02]"
+                                            className="w-full py-4 px-6 bg-[#ffcc00] hover:bg-[#ffdd33] text-black font-black text-[14px] uppercase shadow-[4px_4px_0_0_#886600] active:translate-y-1 active:shadow-none transition-all"
                                         >
-                                            SAVE CHANGES
+                                            UPDATE_DATABASE
                                         </button>
                                     </div>
                                 </form>
                             </div>
                         </div>
+                    </div>
+
+                    {/* Footer Garnish */}
+                    <div className="h-6 bg-[#111] border-t-[2px] border-[#333] flex items-center px-4 justify-between">
+                        <div className="text-[8px] text-[#444] font-black">CRC_CHECK: OK</div>
+                        <div className="text-[8px] text-[#444] font-black">LOCAL_TIME: {new Date().toLocaleTimeString()}</div>
                     </div>
                 </div>
             </div>

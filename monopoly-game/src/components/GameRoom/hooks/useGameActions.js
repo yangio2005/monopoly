@@ -75,11 +75,11 @@ export const useGameActions = (roomId, user, roomData, sounds, callbacks = {}) =
         }
     };
 
-    const handleTransfer = async (amount, recipientId, minTransferAmount, playerRefs, bankRef, onSuccess) => {
+    const handleTransfer = async (amount, targetRecipientId, minTransferAmount, playerRefs, bankRef, onSuccess, customSenderId = null) => {
         setTransferError('');
 
-        if (!user || !roomData || !roomData.players || !roomData.players[user.uid]) {
-            setTransferError("You are not a player in this room.");
+        if (!user || !roomData || !roomData.players) {
+            setTransferError("Session error: player data not loaded.");
             return;
         }
 
@@ -89,19 +89,20 @@ export const useGameActions = (roomId, user, roomData, sounds, callbacks = {}) =
             return;
         }
 
-        const senderPlayer = roomData.players[user.uid];
-        if (user.uid !== BANK_UID && senderPlayer.balance < parsedAmount) {
+        // Determine actual sender and recipient
+        // If customSenderId is provided, use it (Banker mode or Receive from Bank mode)
+        const actualSenderId = customSenderId || user.uid;
+        const actualRecipientId = targetRecipientId;
+
+        const senderPlayer = roomData.players[actualSenderId];
+        // Only check balance if sender is NOT the bank
+        if (actualSenderId !== BANK_UID && senderPlayer && senderPlayer.balance < parsedAmount) {
             setTransferError("Insufficient balance.");
             return;
         }
 
-        if (!recipientId) {
-            setTransferError("Please select a recipient.");
-            return;
-        }
-
         try {
-            await performTransfer(roomId, user.uid, recipientId, parsedAmount);
+            await performTransfer(roomId, actualSenderId, actualRecipientId, parsedAmount);
 
             sounds.transferSound.play();
 
@@ -111,25 +112,24 @@ export const useGameActions = (roomId, user, roomData, sounds, callbacks = {}) =
             if (voiceSettings && voiceSettings.sentTemplate) {
                 options.template = voiceSettings.sentTemplate;
             }
-            options.sender = roomData.players[user.uid]?.name || 'Bạn';
-            options.receiver = recipientId === BANK_UID
-                ? 'Ngân hàng'
-                : (roomData.players[recipientId]?.name || 'Người nhận');
+
+            options.sender = actualSenderId === BANK_UID ? 'Ngân hàng' : (roomData.players[actualSenderId]?.name || 'Unknown');
+            options.receiver = actualRecipientId === BANK_UID ? 'Ngân hàng' : (roomData.players[actualRecipientId]?.name || 'Unknown');
 
             announceMoneySent(parsedAmount, currencySymbol, options);
 
-            // Trigger character reaction for sent money
+            // Trigger character reaction
             if (callbacks.onTransferSent) {
-                callbacks.onTransferSent();
+                callbacks.onTransferSent(parsedAmount, actualRecipientId);
             }
 
-            setPlayersToAnimate([user.uid, recipientId]);
+            setPlayersToAnimate([actualSenderId, actualRecipientId]);
 
             if (onSuccess) onSuccess();
 
             // Trigger Animation
-            const senderElement = playerRefs.current[user.uid];
-            const recipientElement = recipientId === BANK_UID ? bankRef.current : playerRefs.current[recipientId];
+            const senderElement = playerRefs.current[actualSenderId] || (actualSenderId === BANK_UID ? bankRef.current : null);
+            const recipientElement = playerRefs.current[actualRecipientId] || (actualRecipientId === BANK_UID ? bankRef.current : null);
 
             if (senderElement && recipientElement) {
                 const senderRect = senderElement.getBoundingClientRect();

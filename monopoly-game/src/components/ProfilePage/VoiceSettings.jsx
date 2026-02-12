@@ -4,12 +4,13 @@ const VariableChip = ({ label, value, icon, onClick }) => (
     <button
         type="button"
         onClick={() => onClick(value)}
-        className="group flex items-center gap-1.5 px-3 py-1.5 bg-white/5 hover:bg-cyan-500/20 border border-white/10 hover:border-cyan-500/50 rounded-full transition-all duration-200 text-xs font-medium text-gray-300 hover:text-cyan-300"
+        className="group relative px-3 py-1 bg-[#111] border border-[#333] hover:border-[#40ffcc] hover:bg-[#40ffcc]/10 shadow-[2px_2px_0_0_rgba(0,0,0,0.5)] active:translate-y-0.5 active:shadow-none transition-all"
         title={`Chèn ${value}`}
     >
-        <span>{icon}</span>
-        <span>{label}</span>
-        <span className="opacity-0 group-hover:opacity-100 transition-opacity text-cyan-500 ml-0.5">+</span>
+        <div className="flex items-center gap-1.5">
+            <span className="text-xs group-hover:scale-110 transition-transform">{icon}</span>
+            <span className="text-[9px] font-black uppercase text-[#888] group-hover:text-[#40ffcc]">{label}</span>
+        </div>
     </button>
 );
 
@@ -33,7 +34,6 @@ const TemplateEditor = ({
 
         onChange(newValue);
 
-        // Restore focus and cursor position
         setTimeout(() => {
             input.focus();
             input.setSelectionRange(start + variable.length, start + variable.length);
@@ -49,24 +49,23 @@ const TemplateEditor = ({
     };
 
     const variables = [
-        { label: 'Số tiền', value: '{amount}', icon: '💰' },
-        { label: 'Đơn vị', value: '{currency}', icon: '💵' },
-        { label: 'Người gửi', value: '{sender}', icon: '👤' },
-        { label: 'Người nhận', value: '{receiver}', icon: '👥' },
+        { label: 'SỐ TIỀN', value: '{amount}', icon: '💰' },
+        { label: 'ĐƠN VỊ', value: '{currency}', icon: '💵' },
+        { label: 'GỬI', value: '{sender}', icon: '👤' },
+        { label: 'NHẬN', value: '{receiver}', icon: '👥' },
     ];
 
     return (
-        <div className={`space-y-3 p-4 rounded-xl border transition-all duration-300 ${isFocused ? 'bg-white/5 border-cyan-500/50 shadow-[0_0_15px_rgba(6,182,212,0.15)]' : 'bg-black/20 border-white/10'}`}>
-            <div className="flex justify-between items-center">
-                <label className="text-sm font-bold text-gray-200 flex items-center gap-2">
+        <div className={`p-4 border-[2px] transition-all bg-[#0a0a0a] ${isFocused ? 'border-[#40ffcc] shadow-[0_0_20px_rgba(64,255,204,0.1)]' : 'border-[#222]'}`}>
+            <div className="flex justify-between items-center mb-3">
+                <label className="text-[10px] font-black text-[#555] uppercase tracking-widest flex items-center gap-2">
+                    <span className={`w-1.5 h-1.5 rounded-full ${isFocused ? 'bg-[#40ffcc] animate-pulse' : 'bg-[#333]'}`}></span>
                     {label}
                 </label>
-                <div className="text-xs text-cyan-400/80 font-mono bg-cyan-950/30 px-2 py-0.5 rounded border border-cyan-500/20">
-                    Preview
-                </div>
+                <div className="text-[8px] font-black text-[#444] uppercase tracking-tighter">DATA_STREAM_0X22</div>
             </div>
 
-            <div className="relative group">
+            <div className="relative group mb-4">
                 <textarea
                     ref={textareaRef}
                     value={value}
@@ -74,16 +73,13 @@ const TemplateEditor = ({
                     onFocus={() => setIsFocused(true)}
                     onBlur={() => setIsFocused(false)}
                     rows={2}
-                    className="w-full bg-black/40 border border-white/10 rounded-lg p-3 text-sm text-white placeholder-gray-600 focus:outline-none focus:border-cyan-500/50 focus:ring-1 focus:ring-cyan-500/50 transition-all resize-none font-mono leading-relaxed"
+                    className="w-full bg-black border border-[#222] p-3 text-sm text-white focus:outline-none focus:border-[#40ffcc]/50 transition-all resize-none font-bold leading-relaxed"
                     placeholder={placeholder}
                 />
-                <div className="absolute bottom-2 right-2 flex gap-1">
-                    {/* Optional: Add quick actions here if needed */}
-                </div>
             </div>
 
-            <div className="flex flex-wrap gap-2 items-center">
-                <span className="text-xs text-gray-500 mr-1">Chèn nhanh:</span>
+            <div className="flex flex-wrap gap-2 items-center mb-4">
+                <span className="text-[8px] font-black text-[#333] uppercase">CONST_VARS:</span>
                 {variables.map((v) => (
                     <VariableChip
                         key={v.value}
@@ -93,12 +89,30 @@ const TemplateEditor = ({
                 ))}
             </div>
 
-            <div className="mt-2 pt-3 border-t border-white/5">
-                <p className="text-xs text-gray-400 mb-1">Xem trước:</p>
-                <p className="text-sm text-cyan-100 italic bg-cyan-500/10 p-2 rounded border border-cyan-500/20">
-                    "{getPreview()}"
-                </p>
+            <div className="pt-3 border-t border-[#1a1a1a]">
+                <div className="flex items-center justify-between mb-1.5">
+                    <span className="text-[8px] font-black text-[#444] uppercase">AUDIO_OUT_PREVIEW:</span>
+                </div>
+                <div className="p-3 bg-black border border-[#1a1a1a] relative overflow-hidden">
+                    <p className="text-xs text-[#40ffcc] italic font-bold">
+                        "{getPreview()}"
+                    </p>
+                    {/* Visual Audio Waveform Garnish */}
+                    <div className="absolute bottom-1 right-2 flex gap-0.5 opacity-20">
+                        <div className="w-[1px] h-2 bg-[#40ffcc] animate-[h-pulse_0.5s_infinite_ease-in-out]"></div>
+                        <div className="w-[1px] h-4 bg-[#40ffcc] animate-[h-pulse_0.7s_infinite_ease-in-out]"></div>
+                        <div className="w-[1px] h-3 bg-[#40ffcc] animate-[h-pulse_0.4s_infinite_ease-in-out]"></div>
+                        <div className="w-[1px] h-5 bg-[#40ffcc] animate-[h-pulse_0.6s_infinite_ease-in-out]"></div>
+                    </div>
+                </div>
             </div>
+
+            <style>{`
+                @keyframes h-pulse {
+                    0%, 100% { transform: scaleY(0.5); }
+                    50% { transform: scaleY(1.5); }
+                }
+            `}</style>
         </div>
     );
 };
@@ -116,105 +130,85 @@ const VoiceSettings = ({
     handleTestReceived
 }) => {
     return (
-        <div className="space-y-6 p-6 bg-gradient-to-br from-[#0f172a] to-[#1e1b4b] border border-white/10 rounded-2xl shadow-2xl backdrop-blur-xl">
-            <div className="flex items-center gap-4 mb-6 pb-4 border-b border-white/10">
-                <div className="p-3 bg-cyan-500/10 rounded-xl border border-cyan-500/20 shadow-[0_0_15px_rgba(6,182,212,0.2)]">
-                    <svg className="w-6 h-6 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z" />
-                    </svg>
-                </div>
-                <div>
-                    <h4 className="text-xl font-bold text-white tracking-tight">Cấu hình Giọng nói</h4>
-                    <p className="text-sm text-gray-400">Tùy chỉnh thông báo âm thanh khi giao dịch</p>
-                </div>
+        <div className="space-y-6 pt-6 border-t border-[#222]">
+            <div className="flex items-center gap-4 mb-4">
+                <h4 className="text-[18px] font-black text-[#40ffcc] uppercase tracking-wider italic">
+                    VOICE_ENGINE_MOD
+                </h4>
+                <div className="h-[2px] flex-1 bg-gradient-to-r from-[#40ffcc]/40 to-transparent"></div>
             </div>
 
             <div className="grid gap-6 lg:grid-cols-2">
                 <TemplateEditor
-                    label="🔔 Khi GỬI tiền"
+                    label="TX_DISBURSE_PROTO"
                     value={sentTemplate}
                     onChange={setSentTemplate}
-                    placeholder="Ví dụ: Đã chuyển {amount} {currency}..."
+                    placeholder="ON_SEND..."
                     previewData={{
                         amount: '50,000',
                         currency: 'VNĐ',
-                        sender: 'Bạn',
-                        receiver: testReceiver || 'Người nhận'
+                        sender: 'BẠN',
+                        receiver: testReceiver || 'RECIPIENT'
                     }}
                 />
 
                 <TemplateEditor
-                    label="📥 Khi NHẬN tiền"
+                    label="RX_COLLECT_PROTO"
                     value={receivedTemplate}
                     onChange={setReceivedTemplate}
-                    placeholder="Ví dụ: {sender} đã chuyển {amount}..."
+                    placeholder="ON_RECEIVE..."
                     previewData={{
                         amount: '100,000',
                         currency: 'VNĐ',
-                        sender: testSender || 'Người gửi',
-                        receiver: 'Bạn'
+                        sender: testSender || 'SENDER',
+                        receiver: 'BẠN'
                     }}
                 />
             </div>
 
-            <div className="bg-white/5 rounded-xl p-4 border border-white/10">
-                <h5 className="text-sm font-bold text-gray-300 mb-4 flex items-center gap-2">
-                    <svg className="w-4 h-4 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19.428 15.428a2 2 0 00-1.022-.547l-2.384-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z" />
-                    </svg>
-                    Khu vực Test & Debug
-                </h5>
+            <div className="bg-[#111] p-6 border-[2px] border-[#222]">
+                <div className="flex items-center gap-2 mb-6">
+                    <div className="w-2 h-2 bg-[#ff4d4d] animate-pulse"></div>
+                    <span className="text-[10px] font-black text-[#888] uppercase tracking-widest">DIAGNOSTIC_TERMINAL</span>
+                </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-                    <div className="space-y-1.5">
-                        <label className="text-xs text-gray-500 ml-1">Tên người gửi giả lập</label>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+                    <div className="space-y-2">
+                        <label className="text-[8px] font-black text-[#444] uppercase ml-1">TEST_SENDER_ID</label>
                         <input
                             type="text"
                             value={testSender}
                             onChange={(e) => setTestSender(e.target.value)}
-                            className="block w-full px-3 py-2 bg-black/30 border border-white/10 rounded-lg text-white text-sm focus:border-purple-500/50 focus:ring-1 focus:ring-purple-500/50 transition-all"
-                            placeholder="Nhập tên..."
+                            className="block w-full px-3 py-3 bg-black border border-[#222] text-white text-xs font-bold focus:border-[#ff4d4d]/50 transition-all placeholder-[#222]"
+                            placeholder="USER_X"
                         />
                     </div>
-                    <div className="space-y-1.5">
-                        <label className="text-xs text-gray-500 ml-1">Tên người nhận giả lập</label>
+                    <div className="space-y-2">
+                        <label className="text-[8px] font-black text-[#444] uppercase ml-1">TEST_RECEIVER_ID</label>
                         <input
                             type="text"
                             value={testReceiver}
                             onChange={(e) => setTestReceiver(e.target.value)}
-                            className="block w-full px-3 py-2 bg-black/30 border border-white/10 rounded-lg text-white text-sm focus:border-purple-500/50 focus:ring-1 focus:ring-purple-500/50 transition-all"
-                            placeholder="Nhập tên..."
+                            className="block w-full px-3 py-3 bg-black border border-[#222] text-white text-xs font-bold focus:border-[#ff4d4d]/50 transition-all placeholder-[#222]"
+                            placeholder="USER_Y"
                         />
                     </div>
                 </div>
 
-                <div className="grid grid-cols-2 gap-3">
+                <div className="grid grid-cols-2 gap-4">
                     <button
                         type="button"
                         onClick={handleTestReceived}
-                        className="group relative overflow-hidden py-2.5 px-4 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white text-sm font-bold rounded-lg shadow-lg shadow-emerald-500/20 transition-all transform hover:scale-[1.01] active:scale-[0.98]"
+                        className="group relative py-3 px-4 bg-[#1a1a1a] border-[2px] border-[#333] hover:border-[#40ffcc] text-[#888] hover:text-[#40ffcc] text-xs font-black uppercase shadow-[4px_4px_0_0_rgba(0,0,0,0.5)] active:translate-y-1 active:shadow-none transition-all"
                     >
-                        <div className="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-300 pointer-events-none"></div>
-                        <span className="relative flex items-center justify-center gap-2">
-                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                            </svg>
-                            Test Nhận Tiền
-                        </span>
+                        [ EXEC_RX_TEST ]
                     </button>
                     <button
                         type="button"
                         onClick={handleTestSent}
-                        className="group relative overflow-hidden py-2.5 px-4 bg-gradient-to-r from-orange-600 to-red-600 hover:from-orange-500 hover:to-red-500 text-white text-sm font-bold rounded-lg shadow-lg shadow-orange-500/20 transition-all transform hover:scale-[1.01] active:scale-[0.98]"
+                        className="group relative py-3 px-4 bg-[#1a1a1a] border-[2px] border-[#333] hover:border-[#ff4d4d] text-[#888] hover:text-[#ff4d4d] text-xs font-black uppercase shadow-[4px_4px_0_0_rgba(0,0,0,0.5)] active:translate-y-1 active:shadow-none transition-all"
                     >
-                        <div className="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-300 pointer-events-none"></div>
-                        <span className="relative flex items-center justify-center gap-2">
-                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" />
-                            </svg>
-                            Test Gửi Tiền
-                        </span>
+                        [ EXEC_TX_TEST ]
                     </button>
                 </div>
             </div>

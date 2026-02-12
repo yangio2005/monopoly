@@ -8,58 +8,60 @@ const ShareRoomModal = () => {
   if (!showShareModal) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 font-retro">
       {/* Backdrop */}
       <div
-        className="absolute inset-0 bg-black/80 backdrop-blur-sm transition-opacity"
+        className="absolute inset-0 bg-black/90 opacity-85"
         onClick={() => { setShowShareModal(false); clickSound.play(); }}
       ></div>
 
       {/* Modal Content */}
-      <div className="relative w-full max-w-sm bg-gray-900/90 rounded-2xl border border-cyan-500/30 shadow-[0_0_50px_rgba(34,211,238,0.2)] overflow-hidden animate-in fade-in zoom-in duration-200">
+      <div className="relative w-full max-w-sm bg-[#1a1a1a] border-[8px] border-black shadow-[16px_16px_0px_0px_rgba(0,0,0,1)] animate-in zoom-in duration-100">
         {/* Header */}
-        <div className="bg-gradient-to-r from-cyan-900/50 to-blue-900/50 p-4 border-b border-white/10 flex items-center justify-between">
-          <h5 className="text-xl font-bold text-cyan-400 flex items-center gap-2">
-            <span className="text-2xl">🔗</span> SHARE ACCESS
+        <div className="bg-black p-4 border-b-8 border-black flex items-center justify-between">
+          <h5 className="text-[14px] font-bold text-[#40ff00] uppercase flex items-center gap-3">
+            <span className="animate-pulse">⦿</span> PROTOCOL_LINK
           </h5>
           <button
             type="button"
-            className="text-gray-400 hover:text-white transition-colors"
+            className="text-white hover:text-[#40ff00]"
             onClick={() => { setShowShareModal(false); clickSound.play(); }}
           >
-            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
+            [X]
           </button>
         </div>
 
-        <div className="p-6 text-center space-y-6">
-          <p className="text-gray-300">Scan to join the game network:</p>
+        <div className="p-8 text-center space-y-8">
+          <p className="text-[10px] text-gray-500 uppercase tracking-tighter">Scan to join the private network:</p>
 
-          <div className="relative inline-block p-4 bg-white rounded-xl shadow-[0_0_30px_rgba(34,211,238,0.3)]">
+          <div className="relative inline-block p-6 bg-white border-4 border-black shadow-[8px_8px_0px_0px_rgba(0,0,0,0.2)]">
             {roomId && (
-              <QRCode value={roomId} size={180} level="H" />
+              <div style={{ imageRendering: 'pixelated' }}>
+                <QRCode value={roomId} size={160} level="H" />
+              </div>
             )}
-            {/* Corner Accents */}
-            <div className="absolute top-0 left-0 w-4 h-4 border-t-2 border-l-2 border-cyan-500 -translate-x-1 -translate-y-1"></div>
-            <div className="absolute top-0 right-0 w-4 h-4 border-t-2 border-r-2 border-cyan-500 translate-x-1 -translate-y-1"></div>
-            <div className="absolute bottom-0 left-0 w-4 h-4 border-b-2 border-l-2 border-cyan-500 -translate-x-1 translate-y-1"></div>
-            <div className="absolute bottom-0 right-0 w-4 h-4 border-b-2 border-r-2 border-cyan-500 translate-x-1 translate-y-1"></div>
+            {/* Corner Decorative Dots */}
+            <div className="absolute -top-2 -left-2 w-4 h-4 bg-black"></div>
+            <div className="absolute -top-2 -right-2 w-4 h-4 bg-black"></div>
+            <div className="absolute -bottom-2 -left-2 w-4 h-4 bg-black"></div>
+            <div className="absolute -bottom-2 -right-2 w-4 h-4 bg-black"></div>
           </div>
 
-          <div className="space-y-2">
-            <div className="text-xs font-mono text-cyan-500 uppercase tracking-widest">Room ID</div>
-            <div className="bg-black/50 border border-white/10 rounded-lg py-3 px-4 font-mono text-xl font-bold text-white tracking-wider select-all">
+          <div className="space-y-3">
+            <div className="text-[10px] font-bold text-[#40ff00] uppercase">ACCESS_KEY</div>
+            <div className="bg-black border-4 border-white p-4 text-white text-[18px] font-bold tracking-[0.2em] select-all">
               {roomId}
             </div>
           </div>
         </div>
 
-        <div className="p-4 bg-black/20 border-t border-white/10 flex justify-center">
+        <div className="p-6 bg-black">
           <button
             type="button"
-            className="w-full px-4 py-2 rounded-lg bg-gray-800 text-gray-300 hover:bg-gray-700 hover:text-white transition-all font-mono text-sm"
+            className="w-full py-4 bg-white border-4 border-black text-black text-[12px] font-bold shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] hover:bg-[#40ff00] transition-all"
             onClick={() => { setShowShareModal(false); clickSound.play(); }}
           >
-            CLOSE
+            RETURN_TO_BASE
           </button>
         </div>
       </div>

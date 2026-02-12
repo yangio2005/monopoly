@@ -8,75 +8,67 @@ const WealthChartModal = ({ isOpen, onClose }) => {
     if (!isOpen || !roomData) return null;
 
     const players = roomData.players ? Object.entries(roomData.players).filter(([uid]) => uid !== BANK_UID) : [];
-
-    // Sort players by balance descending
     const sortedPlayers = [...players].sort(([, a], [, b]) => b.balance - a.balance);
-
-    // Find max balance for scaling (avoid division by zero)
     const maxBalance = Math.max(...sortedPlayers.map(([, p]) => p.balance), 1);
 
     return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 font-retro">
             {/* Backdrop */}
             <div
-                className="absolute inset-0 bg-black/80 backdrop-blur-sm transition-opacity"
+                className="absolute inset-0 bg-black/90 opacity-85"
                 onClick={() => { onClose(); clickSound.play(); }}
             ></div>
 
             {/* Modal Content */}
-            <div className="relative w-full max-w-lg bg-gray-900/95 rounded-2xl border border-purple-500/30 shadow-[0_0_50px_rgba(168,85,247,0.2)] overflow-hidden animate-in fade-in zoom-in duration-200 flex flex-col max-h-[80vh]">
+            <div className="relative w-full max-w-lg bg-[#1a1a1a] border-[8px] border-black shadow-[16px_16px_0px_0px_rgba(0,0,0,1)] flex flex-col max-h-[85vh] animate-in zoom-in duration-100">
 
                 {/* Header */}
-                <div className="bg-gradient-to-r from-purple-900/50 to-pink-900/50 p-4 border-b border-white/10 flex items-center justify-between flex-shrink-0">
-                    <h5 className="text-xl font-bold text-purple-400 flex items-center gap-2">
-                        <span className="text-2xl">📊</span> WEALTH ANALYTICS
+                <div className="bg-black p-4 border-b-8 border-black flex items-center justify-between flex-shrink-0">
+                    <h5 className="text-[14px] font-bold text-[#f0f] uppercase flex items-center gap-3">
+                        <span className="animate-pulse">▶</span> LEADERBOARD
                     </h5>
                     <button
                         type="button"
-                        className="text-gray-400 hover:text-white transition-colors"
+                        className="text-white hover:text-[#f0f]"
                         onClick={() => { onClose(); clickSound.play(); }}
                     >
-                        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
+                        [X]
                     </button>
                 </div>
 
                 {/* Chart Area */}
-                <div className="p-6 overflow-y-auto custom-scrollbar">
-                    <div className="space-y-5">
+                <div className="p-8 overflow-y-auto custom-scrollbar bg-black/50">
+                    <div className="space-y-8">
                         {sortedPlayers.map(([uid, playerData], index) => {
                             const isCurrentUser = uid === user.uid;
-                            const percentage = Math.max((playerData.balance / maxBalance) * 100, 1); // Min 1% width
+                            const percentage = Math.max((playerData.balance / maxBalance) * 100, 2);
 
                             return (
                                 <div key={uid} className="relative">
-                                    <div className="flex justify-between items-end mb-1">
-                                        <div className="flex items-center gap-2">
-                                            <span className={`text-sm font-bold font-mono ${index === 0 ? 'text-yellow-400' : index === 1 ? 'text-gray-300' : index === 2 ? 'text-orange-400' : 'text-gray-500'}`}>
+                                    <div className="flex justify-between items-end mb-3">
+                                        <div className="flex items-center gap-3">
+                                            <span className={`text-[12px] font-bold ${index === 0 ? 'text-[#ffcc00]' : index === 1 ? 'text-gray-300' : index === 2 ? 'text-[#ff6600]' : 'text-gray-600'}`}>
                                                 #{index + 1}
                                             </span>
-                                            <span className={`text-sm font-bold truncate max-w-[120px] ${isCurrentUser ? 'text-green-400' : 'text-white'}`}>
-                                                {playerData.name} {isCurrentUser && '(YOU)'}
+                                            <span className={`text-[10px] font-bold uppercase truncate max-w-[150px] ${isCurrentUser ? 'text-[#40ff00]' : 'text-white'}`}>
+                                                {playerData.name}
                                             </span>
                                         </div>
-                                        <span className="text-sm font-mono font-bold text-cyan-400">
+                                        <span className="text-[10px] font-bold text-[#00f0ff]">
                                             {formatCurrency(playerData.balance, currencySymbol, currencyCode)}
                                         </span>
                                     </div>
 
-                                    {/* Bar Background */}
-                                    <div className="h-3 w-full bg-gray-800 rounded-full overflow-hidden">
-                                        {/* Bar Fill */}
+                                    {/* Pixel Bar */}
+                                    <div className="h-6 w-full bg-[#222] border-4 border-black relative overflow-hidden">
                                         <div
-                                            className={`h-full rounded-full transition-all duration-1000 ease-out relative group
-                        ${isCurrentUser
-                                                    ? 'bg-gradient-to-r from-green-600 to-green-400 shadow-[0_0_10px_rgba(74,222,128,0.5)]'
-                                                    : 'bg-gradient-to-r from-purple-600 to-cyan-500'
-                                                }
-                      `}
+                                            className={`h-full transition-all duration-1000 ease-out
+                                                ${isCurrentUser ? 'bg-[#40ff00]' : 'bg-[#f0f]'}
+                                            `}
                                             style={{ width: `${percentage}%` }}
                                         >
-                                            {/* Shine Effect */}
-                                            <div className="absolute inset-0 bg-gradient-to-b from-white/20 to-transparent"></div>
+                                            {/* Retro Scanline on bar */}
+                                            <div className="absolute inset-0 opacity-20" style={{ backgroundImage: 'linear-gradient(rgba(0,0,0,0.5) 50%, transparent 50%)', backgroundSize: '100% 2px' }}></div>
                                         </div>
                                     </div>
                                 </div>
@@ -86,12 +78,27 @@ const WealthChartModal = ({ isOpen, onClose }) => {
                 </div>
 
                 {/* Footer */}
-                <div className="p-4 bg-black/20 border-t border-white/10 flex justify-center flex-shrink-0">
-                    <div className="text-xs font-mono text-gray-500">
-                        TOTAL ECONOMY: {formatCurrency(sortedPlayers.reduce((acc, [, p]) => acc + p.balance, 0), currencySymbol, currencyCode)}
+                <div className="p-6 bg-black border-t-8 border-black flex flex-col gap-4 flex-shrink-0">
+                    <div className="text-[8px] text-gray-500 uppercase flex justify-between">
+                        <span>Global_Economy:</span>
+                        <span className="text-white">
+                            {formatCurrency(sortedPlayers.reduce((acc, [, p]) => acc + p.balance, 0), currencySymbol, currencyCode)}
+                        </span>
                     </div>
+                    <button
+                        onClick={() => { onClose(); clickSound.play(); }}
+                        className="w-full py-3 bg-white border-4 border-black text-black text-[12px] font-bold shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:bg-[#ffcc00] transition-all"
+                    >
+                        DISMISS
+                    </button>
                 </div>
             </div>
+
+            <style jsx>{`
+                .custom-scrollbar::-webkit-scrollbar { width: 8px; }
+                .custom-scrollbar::-webkit-scrollbar-track { background: #000; }
+                .custom-scrollbar::-webkit-scrollbar-thumb { background: #333; border: 2px solid #000; }
+            `}</style>
         </div>
     );
 };

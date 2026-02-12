@@ -9,16 +9,17 @@ import BankSettingsModal from './GameRoom/BankSettingsModal';
 import WealthChartModal from './GameRoom/WealthChartModal';
 import { GameRoomProvider, useGameRoom } from './GameRoom/GameRoomProvider';
 import GameRoomCharacters from './GameRoom/GameRoomCharacters';
+import TransactionBanner from './GameRoom/TransactionBanner';
 
 const GameRoomContent = () => {
   const { roomId, roomData, loading, error, setShowShareModal, clickSound, isAnimating, animationDetails, user, BANK_UID, setShowBankSettingsModal, showWealthModal, setShowWealthModal, characterTransactionType } = useGameRoom();
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-900 text-cyan-400 font-mono">
-        <div className="flex flex-col items-center gap-4">
-          <div className="w-16 h-16 border-4 border-cyan-500/30 border-t-cyan-500 rounded-full animate-spin"></div>
-          <div className="animate-pulse">INITIALIZING CONNECTION...</div>
+      <div className="min-h-screen flex items-center justify-center bg-[#0a0a0a] font-retro">
+        <div className="flex flex-col items-center gap-6">
+          <div className="w-16 h-16 bg-[#ffcc00] border-4 border-black animate-bounce shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]"></div>
+          <div className="text-[#ffcc00] text-xl animate-pulse tracking-widest">INITIALIZING...</div>
         </div>
       </div>
     );
@@ -26,11 +27,17 @@ const GameRoomContent = () => {
 
   if (error) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-900 p-4">
-        <div className="bg-red-900/20 border border-red-500/50 text-red-400 p-6 rounded-xl backdrop-blur-xl max-w-md w-full text-center shadow-[0_0_30px_rgba(239,68,68,0.2)]">
-          <div className="text-4xl mb-4">⚠️</div>
-          <h3 className="text-xl font-bold mb-2">SYSTEM ERROR</h3>
-          <p>{error}</p>
+      <div className="min-h-screen flex items-center justify-center bg-[#0a0a0a] p-4 font-retro">
+        <div className="bg-[#ff3333] border-8 border-black text-white p-8 shadow-[12px_12px_0px_0px_rgba(0,0,0,1)] max-w-md w-full text-center">
+          <div className="text-4xl mb-4 animate-flicker">⚠️</div>
+          <h3 className="text-xl font-bold mb-4">SYSTEM_HALT</h3>
+          <p className="text-[10px] leading-relaxed">{error}</p>
+          <button
+            onClick={() => window.location.reload()}
+            className="mt-6 px-6 py-2 bg-white text-black border-4 border-black font-bold shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] active:shadow-none active:translate-x-1 active:translate-y-1"
+          >
+            REBOOT
+          </button>
         </div>
       </div>
     );
@@ -38,54 +45,67 @@ const GameRoomContent = () => {
 
   if (!roomData) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-900 text-gray-400 font-mono">
-        Room data not available.
+      <div className="min-h-screen flex items-center justify-center bg-[#0a0a0a] text-gray-500 font-retro">
+        <p className="animate-pulse text-[10px]">DISK_READ_ERROR: DATA_NOT_FOUND</p>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-[#0a0a0f] bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-purple-900/20 via-gray-900 to-black text-gray-100 pt-20 pb-10 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-7xl mx-auto">
-        {/* Header Section */}
-        <div className="relative mb-8 p-6 rounded-2xl bg-white/5 border border-white/10 backdrop-blur-xl shadow-2xl overflow-hidden group">
-          <div className="absolute inset-0 bg-gradient-to-r from-cyan-500/10 via-purple-500/10 to-pink-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+    <div className="min-h-screen bg-[#0a0a0a] text-white font-retro pt-24 pb-12 px-4 relative overflow-hidden">
+      {/* Retro Grid Background */}
+      <div className="absolute inset-0 z-0 opacity-10 pointer-events-none"
+        style={{
+          backgroundImage: 'linear-gradient(#444 1px, transparent 1px), linear-gradient(90deg, #444 1px, transparent 1px)',
+          backgroundSize: '30px 30px'
+        }}>
+      </div>
 
-          <div className="relative flex flex-col md:flex-row items-center justify-between gap-4">
-            <div className="text-center md:text-left">
-              <h2 className="text-3xl md:text-4xl font-black tracking-tighter text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-purple-400 to-pink-400 drop-shadow-[0_0_10px_rgba(168,85,247,0.5)]">
-                {roomData.name || roomId}
-              </h2>
-              <div className="flex items-center gap-2 mt-2 justify-center md:justify-start">
-                <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
-                <span className="text-xs font-mono text-green-400/80 tracking-widest">SYSTEM ONLINE</span>
+      {/* CRT Scanline Overlay */}
+      <div className="absolute inset-0 pointer-events-none z-50 crt-overlay opacity-[0.04]"></div>
+
+      <div className="max-w-7xl mx-auto relative z-10">
+        {/* Header Section - Exactly like the image */}
+        <div className="relative mb-8 md:mb-14 p-4 md:p-8 bg-[#0a0a0a] border-[4px] border-[#ffcc00] shadow-[0_0_20px_rgba(255,204,0,0.2)] overflow-hidden">
+          <div className="flex flex-col lg:flex-row items-center justify-between gap-6 md:gap-8">
+            <div className="text-center lg:text-left w-full lg:w-auto">
+              <div className="flex flex-col sm:flex-row items-center lg:items-baseline gap-2 md:gap-4 justify-center lg:justify-start">
+                <span className={`text-[#ffcc00] font-black leading-none ${(roomId?.length > 4) ? 'text-[24px] md:text-[32px]' : 'text-[40px] md:text-[48px]'} break-all`}>
+                  {roomId?.toUpperCase() || '3'}
+                </span>
+                <h2 className="text-[20px] md:text-[28px] lg:text-[32px] font-black text-white tracking-widest uppercase whitespace-nowrap">
+                  MONOPOLY DIGITAL
+                </h2>
+              </div>
+              <div className="flex items-center gap-3 mt-4 justify-center lg:justify-start">
+                <div className="w-3 h-3 md:w-4 md:h-4 bg-[#40ff00] shadow-[0_0_10px_#40ff00]"></div>
+                <span className="text-[10px] md:text-[12px] text-[#40ff00] font-bold uppercase tracking-widest truncate max-w-[200px] md:max-w-none">
+                  ROOM {roomData.name || roomId}
+                </span>
               </div>
             </div>
 
-            <div className="flex flex-wrap items-center justify-center gap-3">
+            <div className="flex flex-wrap items-center justify-center gap-3 md:gap-6">
               <button
-                className="px-4 py-2 bg-purple-500/10 hover:bg-purple-500/20 border border-purple-500/50 text-purple-400 rounded-lg transition-all hover:shadow-[0_0_15px_rgba(168,85,247,0.3)] backdrop-blur-sm flex items-center gap-2 font-mono text-sm"
+                className="px-4 md:px-8 py-2 md:py-3 bg-[#ffffcc] border-4 border-black text-black text-[10px] md:text-[14px] font-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] transition-all"
                 onClick={() => { setShowWealthModal(true); clickSound.play(); }}
               >
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" /></svg>
-                STATS
+                [STATS]
               </button>
 
               <button
-                className="px-4 py-2 bg-cyan-500/10 hover:bg-cyan-500/20 border border-cyan-500/50 text-cyan-400 rounded-lg transition-all hover:shadow-[0_0_15px_rgba(34,211,238,0.3)] backdrop-blur-sm flex items-center gap-2 font-mono text-sm"
+                className="px-4 md:px-8 py-2 md:py-3 bg-[#ccffff] border-4 border-black text-black text-[10px] md:text-[14px] font-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] transition-all"
                 onClick={() => { setShowShareModal(true); clickSound.play(); }}
               >
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" /></svg>
-                SHARE
+                [SHARE]
               </button>
 
               {user && user.uid === BANK_UID && (
                 <button
-                  className="px-4 py-2 bg-yellow-500/10 hover:bg-yellow-500/20 border border-yellow-500/50 text-yellow-400 rounded-lg transition-all hover:shadow-[0_0_15px_rgba(234,179,8,0.3)] backdrop-blur-sm flex items-center gap-2 font-mono text-sm"
+                  className="px-3 md:px-4 py-2 md:py-3 bg-[#ffccff] border-4 border-black text-black text-[10px] md:text-[12px] font-bold shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] transition-all"
                   onClick={() => { setShowBankSettingsModal(true); clickSound.play(); }}
                 >
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" /></svg>
-                  BANK
+                  [ADMIN]
                 </button>
               )}
             </div>
@@ -93,15 +113,14 @@ const GameRoomContent = () => {
         </div>
 
         {error && (
-          <div className="mb-6 p-4 bg-red-900/20 border border-red-500/50 text-red-400 rounded-xl backdrop-blur-sm flex items-center gap-3">
-            <svg className="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-            {error}
+          <div className="mb-10 bg-[#ff3333] border-4 border-black p-4 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] animate-shake text-[10px] font-bold flex items-center gap-3">
+            <span className="text-xl">!</span> {error}
           </div>
         )}
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
           {/* Left Column: Players */}
-          <div className="space-y-6">
+          <div className="space-y-10">
             {/* Mobile View */}
             <div className="lg:hidden">
               <MobilePlayerList />
@@ -113,9 +132,13 @@ const GameRoomContent = () => {
           </div>
 
           {/* Right Column: Banking & Logs */}
-          <div className="space-y-6">
-            <BankingModal />
-            <TransactionLog />
+          <div className="space-y-10">
+            <div className="bg-[#111] border-4 border-white shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]">
+              <BankingModal />
+            </div>
+            <div className="bg-[#111] border-4 border-white shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]">
+              <TransactionLog />
+            </div>
           </div>
         </div>
       </div>
@@ -125,6 +148,29 @@ const GameRoomContent = () => {
       <WealthChartModal isOpen={showWealthModal} onClose={() => setShowWealthModal(false)} />
       <MoneyTransferAnimation isAnimating={isAnimating} animationDetails={animationDetails} />
       <GameRoomCharacters transactionType={characterTransactionType} />
+      <TransactionBanner />
+
+      <style jsx>{`
+        .crt-overlay {
+          background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
+          background-size: 100% 4px, 3px 100%;
+        }
+        
+        @keyframes flicker {
+          0% { opacity: 0.9; } 5% { opacity: 1; } 10% { opacity: 0.9; } 
+          15% { opacity: 1; } 80% { opacity: 1; } 85% { opacity: 0.8; } 
+          90% { opacity: 1; }
+        }
+
+        .animate-flicker { animation: flicker 0.1s infinite; }
+        
+        @keyframes shake {
+          0%, 100% { transform: translate(0, 0); }
+          10%, 30%, 50%, 70%, 90% { transform: translate(-4px, 0); }
+          20%, 40%, 60%, 80% { transform: translate(4px, 0); }
+        }
+        .animate-shake { animation: shake 0.5s ease-in-out; }
+      `}</style>
     </div>
   );
 };

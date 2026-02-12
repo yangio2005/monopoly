@@ -10,39 +10,45 @@ const CreateRoomForm = ({ onCreateRoom, isLoading, clickSound }) => {
     };
 
     return (
-        <div className="mb-6">
-            <h3 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
-                <svg className="w-6 h-6 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-                </svg>
-                Create New Room
+        <div className="bg-[#f0f0f0] border-4 border-black p-6 shadow-[6px_6px_0px_0px_rgba(0,0,0,1)]">
+            <h3 className="text-[14px] font-bold text-black mb-6 uppercase flex items-center gap-2">
+                <span className="w-4 h-4 bg-[#40ff00] border-2 border-black"></span>
+                Create Room
             </h3>
-            <input
-                type="text"
-                className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all duration-300 hover:bg-white/10 mb-3"
-                placeholder="Enter Room Name"
-                value={roomName}
-                onChange={(e) => setRoomName(e.target.value)}
-                required
-            />
-            <input
-                type="number"
-                className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all duration-300 hover:bg-white/10 mb-3"
-                placeholder="Initial Balance (Default: 1500)"
-                value={initialBalance}
-                onChange={(e) => setInitialBalance(e.target.value)}
-                min="1"
-            />
-            <button
-                onClick={handleSubmit}
-                disabled={isLoading}
-                className="w-full py-3 px-6 bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white font-bold rounded-xl shadow-lg hover:shadow-green-500/50 transform hover:scale-[1.02] active:scale-[0.98] transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none flex items-center justify-center gap-2"
-            >
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v16m8-8H4" />
-                </svg>
-                Create New Room
-            </button>
+
+            <div className="space-y-6">
+                <div>
+                    <label className="block text-[10px] text-black mb-2 font-bold">ROOM NAME:</label>
+                    <input
+                        type="text"
+                        className="w-full p-3 bg-white border-4 border-black text-[12px] text-black focus:bg-[#ffffcc] focus:outline-none shadow-[inset_4px_4px_0px_rgba(0,0,0,0.1)]"
+                        placeholder="WORLD_NAME"
+                        value={roomName}
+                        onChange={(e) => setRoomName(e.target.value)}
+                        required
+                    />
+                </div>
+
+                <div>
+                    <label className="block text-[10px] text-black mb-2 font-bold">START BANK (1500):</label>
+                    <input
+                        type="number"
+                        className="w-full p-3 bg-white border-4 border-black text-[12px] text-black focus:bg-[#ffffcc] focus:outline-none shadow-[inset_4px_4px_0px_rgba(0,0,0,0.1)]"
+                        placeholder="1500"
+                        value={initialBalance}
+                        onChange={(e) => setInitialBalance(e.target.value)}
+                        min="1"
+                    />
+                </div>
+
+                <button
+                    onClick={handleSubmit}
+                    disabled={isLoading}
+                    className="w-full py-4 bg-[#40ff00] border-4 border-black text-black text-[14px] font-bold shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] active:translate-x-[4px] active:translate-y-[4px] active:shadow-none transition-all disabled:opacity-50"
+                >
+                    {isLoading ? "BUILDING..." : "CREATE WORLD"}
+                </button>
+            </div>
         </div>
     );
 };

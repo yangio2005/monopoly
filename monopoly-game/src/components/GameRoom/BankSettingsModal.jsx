@@ -21,111 +21,106 @@ const BankSettingsModal = () => {
   if (!showBankSettingsModal || user.uid !== BANK_UID) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 font-retro">
       {/* Backdrop */}
       <div
-        className="absolute inset-0 bg-black/80 backdrop-blur-sm transition-opacity"
+        className="absolute inset-0 bg-black/90 opacity-85"
         onClick={() => { setShowBankSettingsModal(false); clickSound.play(); }}
       ></div>
 
       {/* Modal Content */}
-      <div className="relative w-full max-w-md bg-gray-900/90 rounded-2xl border border-yellow-500/30 shadow-[0_0_50px_rgba(234,179,8,0.2)] overflow-hidden animate-in fade-in zoom-in duration-200">
+      <div className="relative w-full max-w-md bg-[#1a1a1a] border-[8px] border-black shadow-[16px_16px_0px_0px_rgba(0,0,0,1)] animate-in zoom-in duration-100">
         {/* Header */}
-        <div className="bg-gradient-to-r from-yellow-900/50 to-orange-900/50 p-4 border-b border-white/10 flex items-center justify-between">
-          <h5 className="text-xl font-bold text-yellow-400 flex items-center gap-2">
-            <span className="text-2xl">⚙️</span> BANK CONFIGURATION
+        <div className="bg-black p-4 border-b-8 border-black flex items-center justify-between">
+          <h5 className="text-[14px] font-bold text-[#ffcc00] uppercase flex items-center gap-3">
+            <span className="animate-pulse">⚙</span> BANK_CONFIG
           </h5>
           <button
             type="button"
-            className="text-gray-400 hover:text-white transition-colors"
+            className="text-white hover:text-[#ffcc00]"
             onClick={() => { setShowBankSettingsModal(false); clickSound.play(); }}
           >
-            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
+            [X]
           </button>
         </div>
 
-        <div className="p-6 space-y-6">
-
-
-          <div className="grid grid-cols-2 gap-4">
+        <div className="p-8 space-y-8">
+          <div className="grid grid-cols-2 gap-6">
             {/* Currency Symbol */}
-            <div className="space-y-2">
-              <label htmlFor="currencySymbolInput" className="block text-sm font-mono text-yellow-400">SYMBOL</label>
+            <div className="space-y-3">
+              <label htmlFor="currencySymbolInput" className="block text-[10px] font-bold text-gray-500 uppercase">SYMBOL</label>
               <input
                 type="text"
-                className="w-full bg-black/50 border border-white/10 rounded-lg py-2 px-3 text-white focus:outline-none focus:border-yellow-500 transition-colors font-mono"
+                className="w-full bg-black border-4 border-white p-3 text-white text-[12px] focus:outline-none focus:border-[#ffcc00] shadow-[inset_4px_4px_0px_rgba(0,0,0,1)]"
                 id="currencySymbolInput"
                 value={newCurrencySymbol}
                 onChange={(e) => setNewCurrencySymbol(e.target.value)}
-                placeholder="e.g., $"
+                placeholder="$"
               />
               {roomData.currencySymbol && (
-                <div className="text-xs font-mono text-gray-500">
-                  CURRENT: <span className="text-white">{roomData.currencySymbol}</span>
+                <div className="text-[8px] text-gray-600">
+                  NOW: {roomData.currencySymbol}
                 </div>
               )}
             </div>
 
             {/* Currency Code */}
-            <div className="space-y-2">
-              <label htmlFor="currencyCodeInput" className="block text-sm font-mono text-yellow-400">CODE</label>
+            <div className="space-y-3">
+              <label htmlFor="currencyCodeInput" className="block text-[10px] font-bold text-gray-500 uppercase">CODE</label>
               <input
                 type="text"
-                className="w-full bg-black/50 border border-white/10 rounded-lg py-2 px-3 text-white focus:outline-none focus:border-yellow-500 transition-colors font-mono"
+                className="w-full bg-black border-4 border-white p-3 text-white text-[12px] focus:outline-none focus:border-[#ffcc00] shadow-[inset_4px_4px_0px_rgba(0,0,0,1)]"
                 id="currencyCodeInput"
                 value={newCurrencyCode}
                 onChange={(e) => setNewCurrencyCode(e.target.value)}
-                placeholder="e.g., USD"
+                placeholder="USD"
               />
               {roomData.currencyCode && (
-                <div className="text-xs font-mono text-gray-500">
-                  CURRENT: <span className="text-white">{roomData.currencyCode}</span>
+                <div className="text-[8px] text-gray-600">
+                  NOW: {roomData.currencyCode}
                 </div>
               )}
             </div>
           </div>
 
           {/* Game Unit */}
-          <div className="space-y-2">
-            <label htmlFor="gameUnitSelect" className="block text-sm font-mono text-yellow-400">GAME UNIT</label>
+          <div className="space-y-3">
+            <label htmlFor="gameUnitSelect" className="block text-[10px] font-bold text-gray-500 uppercase">UNIT_SCALE</label>
             <div className="relative">
               <select
                 id="gameUnitSelect"
-                className="w-full bg-black/50 border border-white/10 rounded-lg py-2 px-3 text-white appearance-none focus:outline-none focus:border-yellow-500 transition-colors"
+                className="w-full bg-black border-4 border-white p-3 text-white text-[12px] appearance-none focus:outline-none focus:border-[#ffcc00]"
                 value={newGameUnit}
                 onChange={(e) => setNewGameUnit(e.target.value)}
               >
-                <option value="">Standard (None)</option>
-                <option value="thousands">Thousands (k)</option>
-                <option value="millions">Millions (m)</option>
-                <option value="billions">Billions (b)</option>
+                <option value="">STANDARD (1:1)</option>
+                <option value="thousands">THOUSANDS (k)</option>
+                <option value="millions">MILLIONS (m)</option>
+                <option value="billions">BILLIONS (b)</option>
               </select>
-              <div className="absolute inset-y-0 right-0 flex items-center px-2 pointer-events-none text-gray-400">
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" /></svg>
-              </div>
             </div>
             {roomData.gameUnit && (
-              <div className="text-xs font-mono text-gray-500">
-                CURRENT: <span className="text-white">{roomData.gameUnit}</span>
+              <div className="text-[8px] text-gray-600 font-bold">
+                NOW: {roomData.gameUnit.toUpperCase()}
               </div>
             )}
           </div>
         </div>
 
-        <div className="p-4 bg-black/20 border-t border-white/10 flex justify-end gap-3">
+        <div className="p-6 bg-black flex flex-col gap-4">
           <button
             type="button"
-            className="px-4 py-2 rounded-lg bg-gray-800 text-gray-300 hover:bg-gray-700 hover:text-white transition-all font-mono text-sm"
-            onClick={() => { setShowBankSettingsModal(false); clickSound.play(); }}
+            className="w-full py-4 bg-[#ffcc00] border-4 border-black text-black text-[14px] font-bold shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] active:translate-x-[4px] active:translate-y-[4px] active:shadow-none transition-all"
+            onClick={() => { handleUpdateCurrencySettings(); clickSound.play(); }}
           >
-            CLOSE
+            WRITE_CONFIG
           </button>
           <button
             type="button"
-            className="px-6 py-2 rounded-lg bg-gradient-to-r from-yellow-600 to-orange-600 hover:from-yellow-500 hover:to-orange-500 text-white font-bold shadow-[0_0_20px_rgba(234,179,8,0.3)] hover:shadow-[0_0_30px_rgba(234,179,8,0.5)] transition-all font-mono text-sm"
-            onClick={() => { handleUpdateCurrencySettings(); clickSound.play(); }}
+            className="w-full py-3 bg-[#333] border-4 border-black text-white text-[10px] font-bold shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] active:translate-x-[4px] active:translate-y-[4px] active:shadow-none transition-all"
+            onClick={() => { setShowBankSettingsModal(false); clickSound.play(); }}
           >
-            SAVE CONFIG
+            DISCARD_CHANGES
           </button>
         </div>
       </div>

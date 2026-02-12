@@ -9,8 +9,8 @@ const MoneyTransferAnimation = ({ isAnimating, animationDetails }) => {
   const translateY = animationDetails.recipientPos.y - animationDetails.senderPos.y;
 
   const transformValue = isAnimating
-    ? `translate(${translateX}px, ${translateY}px) scale(1.2) translate(-50%, -50%)`
-    : `translate(-50%, -50%)`; // Initial state at sender's position, centered
+    ? `translate(${translateX}px, ${translateY}px) scale(1.5) translate(-50%, -50%)`
+    : `translate(-50%, -50%)`;
 
   return (
     <div
@@ -22,11 +22,11 @@ const MoneyTransferAnimation = ({ isAnimating, animationDetails }) => {
         zIndex: 1000,
         pointerEvents: 'none',
       }}
-      className="transition-all duration-[1500ms] ease-in-out"
+      className="transition-all duration-[1200ms] ease-in font-retro"
     >
-      <span className="px-3 py-1 rounded-full bg-yellow-500 text-black font-bold font-mono text-lg shadow-[0_0_15px_rgba(234,179,8,0.5)] border border-yellow-300">
+      <div className="px-4 py-2 bg-[#ffcc00] text-black font-bold text-[14px] border-4 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
         -${animationDetails.amount}
-      </span>
+      </div>
     </div>
   );
 };

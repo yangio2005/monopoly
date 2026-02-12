@@ -4,7 +4,6 @@ const RoomList = ({ rooms, onJoinRoom, isLoading, clickSound }) => {
     const [timeFilter, setTimeFilter] = useState('7days');
     const [searchQuery, setSearchQuery] = useState('');
 
-    // Filter rooms based on time and search query with OR logic
     const filteredRooms = Object.entries(rooms).filter(([, roomData]) => {
         const now = Date.now();
         const daysToMs = timeFilter === '7days' ? 7 * 24 * 60 * 60 * 1000 : 30 * 24 * 60 * 60 * 1000;
@@ -16,7 +15,6 @@ const RoomList = ({ rooms, onJoinRoom, isLoading, clickSound }) => {
         const passesSearchFilter = searchQuery.trim() === '' ||
             (roomData.name && roomData.name.toLowerCase().includes(searchQuery.toLowerCase()));
 
-        // OR logic: pass if either condition is true
         return passesTimeFilter || passesSearchFilter;
     });
 
@@ -26,83 +24,73 @@ const RoomList = ({ rooms, onJoinRoom, isLoading, clickSound }) => {
     };
 
     return (
-        <div className="backdrop-blur-xl bg-white/10 rounded-3xl shadow-2xl border border-white/20 p-6 md:p-8 animate-fade-in-up animation-delay-200">
-            <h3 className="text-2xl font-bold text-white mb-4 flex items-center gap-2">
-                <svg className="w-6 h-6 text-yellow-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
-                </svg>
-                Available Rooms
+        <div className="bg-[#1a1a1a] border-4 border-white p-6 shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]">
+            <h3 className="text-[18px] font-bold text-[#ffcc00] mb-8 uppercase flex items-center gap-3">
+                <span className="w-6 h-6 bg-[#ffcc00] border-2 border-black animate-pulse"></span>
+                Active Channels
             </h3>
 
             {/* Filter Controls */}
-            <div className="mb-4 space-y-3">
-                <div className="flex flex-col sm:flex-row gap-3">
+            <div className="mb-8 space-y-4">
+                <div className="flex flex-col sm:flex-row gap-4">
                     <input
                         type="text"
-                        className="flex-1 px-4 py-2 bg-white/5 border border-white/10 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-transparent transition-all duration-300 hover:bg-white/10 text-sm"
-                        placeholder="Search by room name..."
+                        className="flex-1 p-3 bg-black border-4 border-[#333] text-white text-[12px] focus:border-[#ffcc00] focus:outline-none"
+                        placeholder="SEARCH_BY_NAME..."
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
                     />
                     <div className="flex gap-2">
                         <button
                             onClick={() => setTimeFilter('7days')}
-                            className={`px-4 py-2 rounded-xl font-medium text-sm transition-all ${timeFilter === '7days'
-                                ? 'bg-yellow-500/20 border border-yellow-500/50 text-yellow-300'
-                                : 'bg-white/5 border border-white/10 text-gray-400 hover:bg-white/10'
+                            className={`px-4 py-2 border-4 text-[10px] font-bold transition-all ${timeFilter === '7days'
+                                ? 'bg-[#ffcc00] border-black text-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]'
+                                : 'bg-transparent border-[#333] text-gray-500 hover:border-gray-400'
                                 }`}
                         >
-                            7 Days
+                            7D
                         </button>
                         <button
                             onClick={() => setTimeFilter('30days')}
-                            className={`px-4 py-2 rounded-xl font-medium text-sm transition-all ${timeFilter === '30days'
-                                ? 'bg-yellow-500/20 border border-yellow-500/50 text-yellow-300'
-                                : 'bg-white/5 border border-white/10 text-gray-400 hover:bg-white/10'
+                            className={`px-4 py-2 border-4 text-[10px] font-bold transition-all ${timeFilter === '30days'
+                                ? 'bg-[#ffcc00] border-black text-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]'
+                                : 'bg-transparent border-[#333] text-gray-500 hover:border-gray-400'
                                 }`}
                         >
-                            30 Days
+                            30D
                         </button>
                     </div>
                 </div>
-                <p className="text-xs text-gray-500">
-                    Showing rooms from last {timeFilter === '7days' ? '7' : '30'} days OR matching "{searchQuery || 'all names'}"
-                </p>
             </div>
 
             {/* Room List */}
             {filteredRooms.length === 0 ? (
-                <div className="text-center py-8">
-                    <svg className="w-16 h-16 text-gray-500 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" />
-                    </svg>
-                    <p className="text-gray-400">No rooms match your filters. Try adjusting them or create a new room!</p>
+                <div className="text-center py-12 border-4 border-dashed border-[#333]">
+                    <p className="text-gray-500 text-[10px]">NO_SERVERS_FOUND</p>
                 </div>
             ) : (
-                <div className="space-y-3">
+                <div className="space-y-4">
                     {filteredRooms.map(([roomId, roomData]) => (
                         <div
                             key={roomId}
-                            className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-xl p-4 hover:bg-white/10 transition-all duration-300 flex items-center justify-between gap-4"
+                            className="bg-[#222] border-4 border-[#333] p-4 flex items-center justify-between gap-4 hover:border-[#40ff00] group transition-colors"
                         >
                             <div className="flex-1">
-                                <h4 className="text-white font-semibold text-lg">{roomData.name}</h4>
-                                <p className="text-gray-400 text-sm">
-                                    ID: <span className="text-purple-400 font-mono">{roomId}</span> •
-                                    <span className="ml-2">
-                                        <svg className="w-4 h-4 inline mr-1" fill="currentColor" viewBox="0 0 20 20">
-                                            <path d="M9 6a3 3 0 11-6 0 3 3 0 016 0zM17 6a3 3 0 11-6 0 3 3 0 016 0zM12.93 17c.046-.327.07-.66.07-1a6.97 6.97 0 00-1.5-4.33A5 5 0 0119 16v1h-6.07zM6 11a5 5 0 015 5v1H1v-1a5 5 0 015-5z" />
-                                        </svg>
-                                        {roomData.players ? Object.keys(roomData.players).length : 0} Players
+                                <h4 className="text-white text-[14px] font-bold uppercase group-hover:text-[#40ff00]">{roomData.name}</h4>
+                                <div className="mt-2 flex items-center gap-4 text-[8px] text-gray-500 uppercase">
+                                    <span>ID: {roomId.slice(0, 8)}...</span>
+                                    <span className="flex items-center gap-1">
+                                        <div className="w-2 h-2 bg-[#40ff00] rounded-full"></div>
+                                        {roomData.players ? Object.keys(roomData.players).length : 0} ON
                                     </span>
-                                </p>
+                                </div>
                             </div>
                             <button
                                 onClick={() => handleJoinRoom(roomId)}
                                 disabled={isLoading}
-                                className="px-6 py-2 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white font-bold rounded-lg shadow-lg hover:shadow-purple-500/50 transform hover:scale-105 active:scale-95 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none whitespace-nowrap"
+                                className="px-6 py-2 bg-white border-4 border-black text-black text-[12px] font-bold shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:bg-[#40ff00] hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:translate-x-[4px] active:translate-y-[4px] active:shadow-none transition-all disabled:opacity-50"
                             >
-                                Join
+                                ENTER
                             </button>
                         </div>
                     ))}

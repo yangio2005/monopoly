@@ -1,4 +1,5 @@
 import React from 'react';
+import { Agentation } from 'agentation';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import LoginPage from './components/LoginPage';
 import HomePage from './components/HomePage';
@@ -26,6 +27,7 @@ function App() {
         <Route path="/showcase" element={<CharacterShowcase />} />
         <Route path="/docs" element={<DocsPage />} />
       </Routes>
+      {import.meta.env.DEV && <Agentation />}
     </Router>
   );
 }

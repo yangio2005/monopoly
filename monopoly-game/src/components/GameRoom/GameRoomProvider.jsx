@@ -46,6 +46,8 @@ export const GameRoomProvider = ({ children }) => {
   const isInitialMount = useRef(true);
   const [playersWithEffect, setPlayersWithEffect] = useState([]);
   const [characterTransactionType, setCharacterTransactionType] = useState(null);
+  const [recentTransaction, setRecentTransaction] = useState(null);
+  const transactionBannerTimeoutRef = useRef(null);
 
   // Custom Hooks
   const { user, roomData, loading, error, bankAvatarURL } = useGameData(roomId);
@@ -64,10 +66,16 @@ export const GameRoomProvider = ({ children }) => {
     handleUpdateGameSettings: updateGameSettingsAction,
     handleTransfer: transferAction
   } = useGameActions(roomId, user, roomData, { transferSound }, {
-    onTransferSent: () => {
+    onTransferSent: (amount, recipientId) => {
       if (transactionTimeoutRef.current) clearTimeout(transactionTimeoutRef.current);
       setCharacterTransactionType({ type: 'sent', timestamp: Date.now() });
       transactionTimeoutRef.current = setTimeout(() => setCharacterTransactionType(null), 12000);
+
+      // Show notification banner
+      if (transactionBannerTimeoutRef.current) clearTimeout(transactionBannerTimeoutRef.current);
+      const recipientName = recipientId === BANK_UID ? 'CENTRAL BANK' : (roomData?.players[recipientId]?.name || 'UNKNOWN');
+      setRecentTransaction({ amount, recipientName });
+      transactionBannerTimeoutRef.current = setTimeout(() => setRecentTransaction(null), 5000);
     }
   });
 
@@ -136,6 +144,11 @@ export const GameRoomProvider = ({ children }) => {
           setCharacterTransactionType({ type: 'received', timestamp: Date.now() });
           transactionTimeoutRef.current = setTimeout(() => setCharacterTransactionType(null), 12000);
 
+          // Show notification banner
+          if (transactionBannerTimeoutRef.current) clearTimeout(transactionBannerTimeoutRef.current);
+          setRecentTransaction({ amount: amountReceived, recipientName: roomData.players[user.uid]?.name || 'YOU' });
+          transactionBannerTimeoutRef.current = setTimeout(() => setRecentTransaction(null), 5000);
+
           setPlayersWithEffect(prev => [...prev, user.uid]);
           setTimeout(() => {
             setPlayersWithEffect(prev => prev.filter(id => id !== user.uid));
@@ -175,7 +188,7 @@ export const GameRoomProvider = ({ children }) => {
     );
   };
 
-  const handleTransfer = () => {
+  const handleTransfer = (customSenderId = null) => {
     transferAction(
       transferAmount,
       selectedRecipientId,
@@ -186,7 +199,8 @@ export const GameRoomProvider = ({ children }) => {
         setTransferAmount('');
         setShowBankingModal(false);
         setSelectedRecipientId(''); // Clear selection after transfer
-      }
+      },
+      customSenderId
     );
   };
 
@@ -242,6 +256,8 @@ export const GameRoomProvider = ({ children }) => {
     BANK_UID,
     characterTransactionType,
     setCharacterTransactionType,
+    recentTransaction,
+    setRecentTransaction,
   };
 
   return (

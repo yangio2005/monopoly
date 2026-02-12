@@ -29,41 +29,34 @@ const MobilePlayerList = () => {
     const totalMoney = players.reduce((sum, [, p]) => sum + (p.balance || 0), 0);
 
     return (
-        <div className="flex flex-col gap-4">
-            {/* Bank Card - Prominent at the top */}
-            <button
-                ref={bankRef}
-                onClick={() => { setSelectedRecipientId(BANK_UID); setShowBankingModal(true); clickSound.play(); }}
-                className={`
-          w-full relative p-4 rounded-xl border transition-all duration-300 flex items-center justify-between
-          ${selectedRecipientId === BANK_UID
-                        ? 'bg-yellow-500/20 border-yellow-500 shadow-[0_0_20px_rgba(234,179,8,0.3)]'
-                        : 'bg-black/40 border-yellow-500/30 active:bg-yellow-500/10'
-                    }
-        `}
-            >
-                <div className="flex items-center gap-3">
-                    <div className={`
-            w-12 h-12 rounded-full flex items-center justify-center border-2 transition-all duration-300
-            ${selectedRecipientId === BANK_UID ? 'border-yellow-400 bg-yellow-500/20' : 'border-yellow-500/30 bg-black/50'}
-          `}>
-                        <span className="text-2xl">🏦</span>
-                    </div>
-                    <div className="text-left">
-                        <div className="text-xs font-mono text-yellow-500/80">CENTRAL BANK</div>
-                        <div className="text-xl font-bold text-yellow-400 font-mono tracking-tight">
-                            {formatCurrency(bank.balance, currencySymbol, currencyCode)}
+        <div className="flex flex-col gap-6 font-retro">
+            {/* Bank Card - Strip style */}
+            <div className="bg-[#0f0f0f] border-[1px] border-[#333] shadow-[0_5px_15px_rgba(0,0,0,0.5)]">
+                <div
+                    onClick={() => { setSelectedRecipientId(BANK_UID); setShowBankingModal(true); clickSound.play(); }}
+                    className={`p-4 flex items-center justify-between transition-all cursor-pointer ${selectedRecipientId === BANK_UID ? 'bg-[#111] ring-2 ring-[#40ff00] ring-inset' : ''}`}
+                >
+                    <div className="flex items-center gap-4">
+                        <div className="w-10 h-10 bg-[#1a1a1a] flex items-center justify-center border-[1px] border-[#444]">
+                            <span className="text-xl opacity-80 filter saturate-0">🏢</span>
+                        </div>
+                        <div className="text-left">
+                            <div className="text-[7px] text-gray-500 font-bold mb-0.5 uppercase tracking-widest">CENTRAL BANK</div>
+                            <div className="text-[16px] font-black text-[#66ccff]">
+                                {formatCurrency(bank.balance, currencySymbol, currencyCode)}
+                            </div>
                         </div>
                     </div>
+                    <div className="flex items-center gap-2">
+                        <div className="text-[7px] font-black text-[#ffcc00] hidden sm:block">DEPOSIT</div>
+                        <div className="text-[#0080ff] text-xl transform rotate-0">▶</div>
+                    </div>
                 </div>
-                <div className="text-yellow-500/50">
-                    <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" /></svg>
-                </div>
-            </button>
+            </div>
 
             {/* Players Horizontal Scroll */}
             <div className="overflow-x-auto pb-4 -mx-4 px-4 scrollbar-hide">
-                <div className="flex gap-3 w-max">
+                <div className="flex gap-4 w-max py-2">
                     {players.map(([uid, playerData]) => {
                         const isCurrentUser = uid === user.uid;
                         const isSelected = selectedRecipientId === uid;
@@ -75,46 +68,46 @@ const MobilePlayerList = () => {
                                 ref={el => playerRefs.current[uid] = el}
                                 onClick={() => { setSelectedRecipientId(uid); setShowBankingModal(true); clickSound.play(); }}
                                 className={`
-                  relative p-3 rounded-xl border transition-all duration-300 w-[140px] flex-shrink-0 flex flex-col items-center gap-3
-                  ${isSelected
-                                        ? 'bg-cyan-500/20 border-cyan-500 shadow-[0_0_20px_rgba(34,211,238,0.3)]'
-                                        : isCurrentUser
-                                            ? 'bg-green-500/10 border-green-500/50'
-                                            : 'bg-black/40 border-white/10'
+                                    relative p-4 bg-[#0a0a0a] border-[1px] transition-all w-[140px] flex-shrink-0 flex flex-col items-center gap-4
+                                    ${isSelected
+                                        ? 'border-[#40ff00] ring-1 ring-[#40ff00] ring-inset shadow-[0_0_15px_rgba(64,255,0,0.2)]'
+                                        : 'border-[#333]'
                                     }
-                  ${hasEffect ? 'animate-pulse ring-2 ring-green-400 shadow-[0_0_30px_rgba(74,222,128,0.5)]' : ''}
-                `}
+                                    ${hasEffect ? 'animate-pulse' : ''}
+                                `}
                             >
                                 <div className="relative">
-                                    {/* Dynamic Avatar Frame */}
+                                    {/* Gold Frame Effect */}
+                                    <div className="absolute inset-[-8px] border-[1px] border-[#ffcc00]/20 rounded-full scale-110 opacity-30"></div>
+
                                     <AvatarFrame
                                         balance={playerData.balance}
                                         totalMoney={totalMoney}
-                                        size={100}
-                                        offset={26}
+                                        size={90}
+                                        offset={30}
                                     />
 
-                                    {playerData.avatarURL ? (
-                                        <img
-                                            src={playerData.avatarURL}
-                                            alt="Avatar"
-                                            className={`w-12 h-12 rounded-full object-cover border-2 relative z-10 ${isSelected ? 'border-cyan-400' : 'border-white/20'}`}
-                                        />
-                                    ) : (
-                                        <div className={`w-12 h-12 rounded-full flex items-center justify-center border-2 relative z-10 ${isSelected ? 'border-cyan-400 bg-cyan-500/20' : 'border-white/20 bg-white/5'}`}>
-                                            <span className="text-xl">👤</span>
-                                        </div>
-                                    )}
-                                    {isCurrentUser && (
-                                        <div className="absolute -top-1 -right-1 w-3 h-3 bg-green-500 rounded-full border-2 border-black z-30"></div>
-                                    )}
+                                    <div className={`w-14 h-14 overflow-hidden bg-[#111] border-[1px] ${isSelected ? 'border-[#40ff00]' : 'border-[#444]'} relative z-10`}>
+                                        {playerData.avatarURL ? (
+                                            <img
+                                                src={playerData.avatarURL}
+                                                alt="Avatar"
+                                                className="w-full h-full object-cover pixelated"
+                                            />
+                                        ) : (
+                                            <div className="w-full h-full flex items-center justify-center text-3xl bg-[#222]">
+                                                👤
+                                            </div>
+                                        )}
+                                        <div className="absolute top-0 right-0 w-3 h-3 bg-[#40ff00] border border-[#0a0a0a] z-20"></div>
+                                    </div>
                                 </div>
 
-                                <div className="text-center w-full overflow-hidden mt-4">
-                                    <h6 className={`text-sm font-bold truncate mb-1 ${isSelected ? 'text-cyan-300' : 'text-gray-200'}`}>
+                                <div className="text-center w-full">
+                                    <h6 className={`text-[10px] font-black uppercase truncate mb-1 tracking-wide ${isSelected ? 'text-[#40ff00]' : 'text-white'}`}>
                                         {playerData.name}
                                     </h6>
-                                    <p className={`text-xs font-mono font-bold ${isSelected ? 'text-cyan-400' : 'text-gray-400'}`}>
+                                    <p className={`text-[8px] font-black ${isSelected ? 'text-[#40ff00]' : 'text-[#40ff00]/60'}`}>
                                         {formatCurrency(playerData.balance, currencySymbol, currencyCode)}
                                     </p>
                                 </div>
@@ -126,5 +119,6 @@ const MobilePlayerList = () => {
         </div>
     );
 };
+
 
 export default MobilePlayerList;
